@@ -1,22 +1,28 @@
 package web
 
 import (
+	"casos-de-codigo/internal/db"
 	"log"
 	"net/http"
 )
 
 type Server struct {
-	addr string
+	addr    string
+	handler *Handler
 }
 
-func NewServer(addr string) *Server {
-	return &Server{addr: addr}
+func NewServer(addr string, dbManager *db.DBManager) *Server {
+	return &Server{
+		addr:    addr,
+		handler: NewHandler(dbManager),
+	}
 }
 
 func (s *Server) Run() error {
-	fileServer := http.FileServer(http.Dir("web"))
+	fs := http.FileServer(http.Dir("web"))
+	http.Handle("/", fs)
 
-	http.Handle("/", fileServer)
+	http.HandleFunc("/api/execute-sql", s.handler.HandleExecuteSQL)
 
 	log.Printf("Servidor iniciado em http://localhost%s", s.addr)
 	return http.ListenAndServe(s.addr, nil)
