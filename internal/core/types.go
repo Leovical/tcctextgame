@@ -14,5 +14,5 @@ type Case interface {
 	GetID() string
 	GetLoadNarrative(puzzleState int) string
 	GetSchema() string
-	ProcessCommand(command string, dbm *db.DBManager, puzzleState int) (GameResponse, int)
+	ProcessCommand(command string, dbm *db.DBManager, puzzleState int, currentFocus string) (GameResponse, int, string)
 }

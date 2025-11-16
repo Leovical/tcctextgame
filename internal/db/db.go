@@ -89,3 +89,18 @@ func (d *DBManager) ResetDatabase(schema string) error {
 
 	return tx.Commit()
 }
+
+func (d *DBManager) ReadStringState(key string) (string, error) {
+	var value string
+	row := d.PlayerDB.QueryRow("SELECT value_text FROM player_state WHERE key = ?", key)
+	err := row.Scan(&value)
+	if err != nil {
+		return "", err
+	}
+	return value, nil
+}
+
+func (d *DBManager) WriteStringState(key string, value string) error {
+	_, err := d.PlayerDB.Exec("INSERT OR REPLACE INTO player_state (key, value_text) VALUES (?, ?)", key, value)
+	return err
+}

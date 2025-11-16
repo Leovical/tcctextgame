@@ -12,6 +12,7 @@ import (
 type PlayerState struct {
 	CurrentCaseID string
 	CurrentPuzzle int
+	CurrentFocus  string
 }
 
 type GameEngine struct {
@@ -31,14 +32,21 @@ func NewGameEngine(dbm *db.DBManager, initialCase core.Case) (*GameEngine, error
 
 	puzzleState, err := dbm.ReadState("current_puzzle")
 	if err != nil {
-		log.Printf("Erro ao ler estado do jogador, iniciando do zero: %v", err)
+		log.Printf("Erro ao ler estado do puzzle, iniciando do zero: %v", err)
 		puzzleState = 1
+	}
+
+	focusState, err := dbm.ReadStringState("current_focus")
+	if err != nil {
+		log.Printf("Erro ao ler estado de foco, iniciando do zero: %v", err)
+		focusState = "none"
 	}
 
 	engine.playerState.CurrentCaseID = initialCase.GetID()
 	engine.playerState.CurrentPuzzle = puzzleState
+	engine.playerState.CurrentFocus = focusState
+	log.Printf("Caso '%s' carregado. Puzzle: %d. Foco: %s.", initialCase.GetID(), puzzleState, focusState)
 
-	log.Printf("Caso '%s' carregado. Iniciando no puzzle %d.", initialCase.GetID(), puzzleState)
 	return engine, nil
 }
 
@@ -57,13 +65,13 @@ func (e *GameEngine) ProcessCommand(command string) core.GameResponse {
 				return core.GameResponse{Error: "Falha ao resetar o banco."}
 			}
 			e.playerState.CurrentPuzzle = 1
+			e.playerState.CurrentFocus = "none"
 			log.Println("Progresso do jogador resetado.")
 			return core.GameResponse{Narrative: "Progresso resetado.\n\n" + e.activeCase.GetLoadNarrative(e.playerState.CurrentPuzzle)}
 		default:
 			return core.GameResponse{Narrative: "Reset cancelado."}
 		}
 	}
-
 	if upperCommand == "RESET" || upperCommand == "REINICIAR" {
 		e.isAwaitingReset = true
 		return core.GameResponse{Narrative: "Tem certeza que deseja apagar todo o seu progresso neste caso e começar do zero? (y/n)"}
@@ -77,10 +85,11 @@ func (e *GameEngine) ProcessCommand(command string) core.GameResponse {
 		return response
 	}
 
-	response, nextPuzzleState := e.activeCase.ProcessCommand(
+	response, nextPuzzleState, nextFocusState := e.activeCase.ProcessCommand(
 		command,
 		e.dbManager,
 		e.playerState.CurrentPuzzle,
+		e.playerState.CurrentFocus,
 	)
 
 	if nextPuzzleState != e.playerState.CurrentPuzzle {
@@ -89,6 +98,14 @@ func (e *GameEngine) ProcessCommand(command string) core.GameResponse {
 			log.Printf("ERRO CRÍTICO: Não foi possível salvar o estado do puzzle: %v", err)
 		}
 		e.playerState.CurrentPuzzle = nextPuzzleState
+	}
+
+	if nextFocusState != e.playerState.CurrentFocus {
+		err := e.dbManager.WriteStringState("current_focus", nextFocusState)
+		if err != nil {
+			log.Printf("ERRO CRÍTICO: Não foi possível salvar o estado de foco: %v", err)
+		}
+		e.playerState.CurrentFocus = nextFocusState
 	}
 
 	return response
@@ -109,7 +126,13 @@ func (e *GameEngine) handleDebugCommands(command string) (core.GameResponse, boo
 			log.Printf("ERRO CRÍTICO: Não foi possível salvar o estado (debug): %v", err)
 		}
 
+		err = e.dbManager.WriteStringState("current_focus", "none")
+		if err != nil {
+			log.Printf("ERRO CRÍTICO: Não foi possível salvar o estado (debug): %v", err)
+		}
+
 		e.playerState.CurrentPuzzle = targetPuzzle
+		e.playerState.CurrentFocus = "none"
 
 		narrativa := fmt.Sprintf("DEBUG: Estado do jogo forçado para Puzzle %d.\n\n%s", targetPuzzle, e.activeCase.GetLoadNarrative(targetPuzzle))
 		return core.GameResponse{Narrative: narrativa}, true
