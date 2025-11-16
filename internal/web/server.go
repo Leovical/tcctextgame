@@ -2,7 +2,6 @@ package web
 
 import (
 	"casos-de-codigo/internal/game"
-	"log"
 	"net/http"
 )
 
@@ -24,6 +23,5 @@ func (s *Server) Run() error {
 	fs := http.FileServer(http.Dir("web"))
 	http.Handle("/", fs)
 
-	log.Printf("Servidor iniciado em http://localhost%s", s.addr)
 	return http.ListenAndServe(s.addr, nil)
 }
