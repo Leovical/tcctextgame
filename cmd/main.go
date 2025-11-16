@@ -1,8 +1,11 @@
 package main
 
 import (
+	"casos-de-codigo/internal/cases"
 	"casos-de-codigo/internal/db"
+	"casos-de-codigo/internal/game"
 	"casos-de-codigo/internal/web"
+	"fmt"
 	"log"
 	"os"
 )
@@ -14,16 +17,23 @@ func main() {
 	}
 	addr := ":" + port
 
-	playerDBPath := "/data/player.db"
-	solutionDBPath := "./solution.db"
+	casoParaJogar := &cases.Case1{}
 
-	dbManager, err := db.NewDBManager(playerDBPath, solutionDBPath)
+	playerDBPath := fmt.Sprintf("./player_%s.db", casoParaJogar.GetID())
+	dbSchema := casoParaJogar.GetSchema()
+
+	dbManager, err := db.NewDBManager(playerDBPath, dbSchema)
 	if err != nil {
-		log.Fatalf("Erro ao iniciar os bancos de dados: %v", err)
+		log.Fatalf("Erro ao iniciar o banco de dados: %v", err)
 	}
 	defer dbManager.Close()
 
-	server := web.NewServer(addr, dbManager)
+	gameEngine, err := game.NewGameEngine(dbManager, casoParaJogar)
+	if err != nil {
+		log.Fatalf("Erro ao iniciar o motor do jogo: %v", err)
+	}
+
+	server := web.NewServer(addr, gameEngine)
 
 	if err := server.Run(); err != nil {
 		log.Fatalf("Erro ao iniciar o servidor: %v", err)
