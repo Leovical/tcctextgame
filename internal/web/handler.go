@@ -1,19 +1,20 @@
 package web
 
 import (
-	"casos-de-codigo/internal/db"
+	"casos-de-codigo/internal/game"
 	"encoding/json"
 	"log"
 	"net/http"
-	"strings"
 )
 
 type Handler struct {
-	dbManager *db.DBManager
+	engine *game.GameEngine
 }
 
-func NewHandler(dbManager *db.DBManager) *Handler {
-	return &Handler{dbManager: dbManager}
+func NewHandler(engine *game.GameEngine) *Handler {
+	return &Handler{
+		engine: engine,
+	}
 }
 
 type ExecuteRequest struct {
@@ -34,66 +35,11 @@ func (h *Handler) HandleExecuteSQL(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Comando recebido: %s", req.SQL)
 
-	if strings.HasPrefix(strings.TrimSpace(strings.ToUpper(req.SQL)), "SELECT") {
-		h.handleSelectQuery(w, r, req.SQL)
-	} else {
-		h.handleExecStatement(w, r, req.SQL)
-	}
-}
-
-func (h *Handler) handleSelectQuery(w http.ResponseWriter, r *http.Request, query string) {
-	rows, err := h.dbManager.QueryPlayer(query)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	defer rows.Close()
-
-	columns, _ := rows.Columns()
-	var results []map[string]interface{}
-	for rows.Next() {
-		values := make([]interface{}, len(columns))
-		scanArgs := make([]interface{}, len(columns))
-		for i := range values {
-			scanArgs[i] = &values[i]
-		}
-		rows.Scan(scanArgs...)
-
-		row := make(map[string]interface{})
-		for i, v := range values {
-			if b, ok := v.([]byte); ok {
-				row[columns[i]] = string(b)
-			} else {
-				row[columns[i]] = v
-			}
-		}
-		results = append(results, row)
-	}
-
-	response := map[string]interface{}{
-		"message": "Consulta executada com sucesso",
-		"data":    results,
-	}
+	response := h.engine.ProcessCommand(req.SQL)
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
-}
-
-func (h *Handler) handleExecStatement(w http.ResponseWriter, r *http.Request, query string) {
-	// TODO: Implementar a validação de segurança aqui para comandos como DROP TABLE.
-	result, err := h.dbManager.ExecuteQueryPlayer(query)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	if response.Error != "" {
+		w.WriteHeader(http.StatusBadRequest)
 	}
-
-	rowsAffected, _ := result.RowsAffected()
-
-	response := map[string]interface{}{
-		"message":       "Comando executado com sucesso",
-		"rows_affected": rowsAffected,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
