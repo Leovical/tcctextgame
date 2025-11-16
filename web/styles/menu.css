@@ -1,0 +1,184 @@
+@font-face {
+    font-family: 'The Led Display';
+    src: url('../fonts/TheLedDisplay.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Pixellari';
+    src: url('../fonts/Pixellari.ttf') format('truetype');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+h1,
+h2 {
+    font-weight: normal;
+    font-family: "The Led Display", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: #33FF33;
+    text-shadow: 0 0 2px #33FF33, 0 0 5px #33FF33;
+}
+
+body {
+    font-family: "The Led Display", monospace;
+    background-color: #020f02;
+    color: #33FF33;
+    overflow: hidden;
+}
+
+.menu {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 40px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.menu::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url("../textures/noise.png") repeat;
+    mix-blend-mode: screen;
+    opacity: 0.40;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.menu::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1px);
+    background-size: 100% 3px;
+    mix-blend-mode: multiply;
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+.menu-header {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+}
+
+.title {
+    font-size: 4.8rem;
+    margin-top: 10px;
+}
+
+.detective {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 78%;
+    width: auto;
+    opacity: 0.92;
+    z-index: 1;
+    image-rendering: crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
+}
+
+.play-button {
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+    width: 210px;
+    height: 80px;
+    border: 2px solid #33FF33;
+    border-radius: 6px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+    background: rgba(0, 0, 0, 0.15);
+    color: #33FF33;
+    z-index: 3;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.play-button span {
+    font-size: 2.2rem;
+    font-weight: normal;
+    letter-spacing: 0.10em;
+    text-shadow: 0 0 2px #33FF33, 0 0 5px #33FF33;
+}
+
+.play-button:hover {
+    background: rgba(0, 40, 0, 0.8);
+    box-shadow: 0 0 12px #33FF33, 0 0 28px #33FF33;
+    transform: translateY(-2px);
+}
+
+.settings-button {
+    position: absolute;
+    right: 40px;
+    bottom: 40px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.settings-button img {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 6px #33FF33);
+    transition: 0.15s;
+}
+
+.settings-button:hover img {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 10px #33FF33);
+}
+
+@media (max-width: 768px) {
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .title {
+        font-size: 2.6rem;
+    }
+
+    .play-button {
+        width: 180px;
+        height: 72px;
+        left: 20px;
+        bottom: 20px;
+    }
+
+    .play-button span {
+        font-size: 1.8rem;
+    }
+
+    .settings-button {
+        right: 20px;
+        bottom: 20px;
+        width: 34px;
+        height: 34px;
+    }
+}

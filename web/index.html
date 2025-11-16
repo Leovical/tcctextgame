@@ -2,31 +2,36 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
     <title>Casos de Código</title>
-    <link rel="stylesheet" href="./styles/main.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles/menu.css" />
 </head>
 
 <body>
-    <div class="texture-overlay"></div>
+    <!-- Música de fundo -->
+    <audio id="bg-music" src="audio/music-loop.mp3" autoplay loop></audio>
 
-    <div class="terminal-container">
+    <main class="menu">
+        <!-- Títulos -->
+        <header class="menu-header">
+            <h2 class="subtitle">AGÊNCIA DE INVESTIGAÇÃO ESPECIAL</h2>
+            <h1 class="title">CASOS DE CÓDIGO</h1>
+        </header>
 
-        <div class="screen-content">
-            <div id="case-title">CASO 1</div>
-            <pre id="output"></pre>
-        </div>
+        <!-- Detetive -->
+        <img src="images/detective.png" alt="Detetive sombrio" class="detective" />
 
-        <div class="input-section">
-            <div class="prompt-bar">/prompt</div>
-            <div class="input-box">
-                <input type="text" id="command-input" autofocus autocomplete="off">
-            </div>
-        </div>
+        <!-- Botão Jogar -->
+        <a href="game.html" class="play-button">
+            <span>Jogar</span>
+        </a>
 
-    </div>
-    <script src="scripts/main.js"></script>
+        <!-- Botão/ícone de configurações -->
+        <button class="settings-button" aria-label="Configurações">
+            <img src="images/settings.png" alt="" />
+        </button>
+    </main>
 </body>
 
 </html>

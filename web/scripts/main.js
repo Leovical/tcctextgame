@@ -3,170 +3,151 @@ let introText = "Iniciando conexão com o DITEC...";
 const outputEl = document.getElementById('output');
 const inputEl = document.getElementById('command-input');
 
+let messageQueue = [];
+let isTyping = false;
+const TYPE_SPEED = 15;
+let isSkipping = false;
+
+document.addEventListener('keydown', (event) => {
+    if ((event.key === 'Enter' || event.key === ' ') && isTyping) {
+        event.preventDefault();
+        isSkipping = true;
+    }
+});
+
 inputEl.addEventListener('keydown', async (event) => {
     if (event.key === 'Enter') {
-        const command = inputEl.value;
-        inputEl.value = '';
-
-        const commandLower = command.trim().toLowerCase();
-        if (commandLower === 'clear' || commandLower === 'limpar' || commandLower === 'cls') {
-            outputEl.innerHTML = '';
-            appendOutput(`➤ ${introText}`, 'narrative');
+        if (isTyping) {
+            isSkipping = true;
             return;
         }
 
-        appendOutput(`\n> ${command}`, 'prompt');
+        const command = inputEl.value;
+        inputEl.value = '';
+        const commandLower = command.trim().toLowerCase();
+
+        if (commandLower === 'clear' || commandLower === 'limpar' || commandLower === 'cls') {
+            outputEl.innerHTML = '';
+            queueMessage(`➤ ${introText}`, 'narrative');
+            return;
+        }
+
+        queueMessage(`\n> ${command}`, 'prompt');
 
         try {
             const response = await fetch('/api/execute-sql', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sql: command }),
             });
-
             const data = await response.json();
 
             if (response.ok) {
-                if (data.narrative) {
-                    appendOutput(`\n➤ ${data.narrative}`, 'narrative');
-                }
-                if (data.data) {
-                    const tableHtml = formatTable(data.data);
-                    appendOutput(tableHtml, 'data');
-                }
+                if (data.narrative) queueMessage(`\n➤ ${data.narrative}`, 'narrative');
+                if (data.data) queueMessage(formatTable(data.data), 'data');
             } else {
-                appendOutput(`\n➤ ERRO: ${data.error || 'Erro desconhecido'}`, 'error');
+                queueMessage(`\n➤ ERRO: ${data.error || 'Erro desconhecido'}`, 'error');
             }
-
         } catch (err) {
-            appendOutput(`\n➤ ERRO DE CONEXÃO: ${err.message}`, 'error');
+            queueMessage(`\n➤ ERRO DE CONEXÃO: ${err.message}`, 'error');
         }
     }
 });
 
+function queueMessage(content, type) {
+    messageQueue.push({ content, type });
+    processQueue();
+}
 
-function appendOutput(content, type) {
-    const isScrolledToBottom = outputEl.scrollHeight - outputEl.clientHeight <= outputEl.scrollTop + 10;
+function processQueue() {
+    if (isTyping || messageQueue.length === 0) return;
 
+    isTyping = true;
+    const message = messageQueue.shift();
     const pre = document.createElement('pre');
-    pre.className = type;
-    pre.innerHTML = content;
+    pre.className = message.type;
     outputEl.appendChild(pre);
 
-    if (isScrolledToBottom) {
-        outputEl.scrollTop = outputEl.scrollHeight;
+    if (message.type === 'data') {
+        pre.innerHTML = message.content;
+        scrollToBottom();
+        isTyping = false;
+        processQueue();
+    } else {
+        typewriter(pre, message.content, () => {
+            isTyping = false;
+            processQueue();
+        });
     }
 }
 
+function typewriter(element, text, callback) {
+    let i = 0;
+    inputEl.disabled = true;
+    isSkipping = false;
+
+    function type() {
+        if (isSkipping) {
+            element.textContent = text;
+            i = text.length;
+            isSkipping = false;
+        }
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            scrollToBottom();
+            setTimeout(type, TYPE_SPEED);
+        } else {
+            inputEl.disabled = false;
+            inputEl.focus();
+            callback();
+        }
+    }
+    type();
+}
+
+function scrollToBottom() {
+    outputEl.scrollTop = outputEl.scrollHeight;
+}
 
 function formatTable(data) {
-    if (!Array.isArray(data) || data.length === 0) {
-        return "Nenhum resultado.";
-    }
+    if (!Array.isArray(data) || data.length === 0) return "Nenhum resultado.";
     const headers = Object.keys(data[0]);
-    if (headers.includes('posicao') && headers.includes('casa')) {
-        return formatLogicPuzzle(data, headers);
-    } else {
-        return formatStandardTable(data, headers);
-    }
+    if (headers.includes('posicao') && headers.includes('casa')) return formatLogicPuzzle(data, headers);
+    return formatStandardTable(data, headers);
 }
 
 function formatLogicPuzzle(data, headers) {
     headers = headers.filter(h => h !== 'posicao');
     headers.unshift('posicao');
-
     const dataByPos = {};
-    data.forEach(row => { dataByPos[row.posicao] = row; });
-
+    data.forEach(row => dataByPos[row.posicao] = row);
     const posicoes = Object.keys(dataByPos).sort();
-    const colWidths = {};
-    const rowHeaders = headers.filter(h => h !== 'posicao');
-
-    let maxHeaderWidth = 0;
-    rowHeaders.forEach(header => {
-        const cleanHeader = formatHeader(header);
-        if (cleanHeader.length > maxHeaderWidth) { maxHeaderWidth = cleanHeader.length; }
-    });
-    maxHeaderWidth += 2;
-
-    posicoes.forEach(pos => {
-        const posStr = `Posição ${pos}`;
-        colWidths[pos] = posStr.length;
-    });
-
-    rowHeaders.forEach(header => {
-        posicoes.forEach(pos => {
-            const val = formatDataCell(dataByPos[pos][header]);
-            if (val.length > colWidths[pos]) { colWidths[pos] = val.length; }
-        });
-    });
-
-    let table = '<table class="logic-table">';
-
-    table += '<thead><tr><th></th>';
-    posicoes.forEach(pos => {
-        table += `<th>Posição ${pos}</th>`;
-    });
-    table += '</tr></thead>';
-
-    table += '<tbody>';
-    rowHeaders.forEach(header => {
-        const cleanHeader = formatHeader(header) + ":";
-        table += `<tr><td>${cleanHeader}</td>`;
-        posicoes.forEach(pos => {
-            const val = formatDataCell(dataByPos[pos][header]);
-            table += `<td>${val}</td>`;
-        });
+    let table = '<table class="logic-table"><thead><tr><th></th>';
+    posicoes.forEach(pos => table += `<th>Posição ${pos}</th>`);
+    table += '</tr></thead><tbody>';
+    headers.filter(h => h !== 'posicao').forEach(header => {
+        table += `<tr><td>${formatHeader(header)}:</td>`;
+        posicoes.forEach(pos => table += `<td>${formatDataCell(dataByPos[pos][header])}</td>`);
         table += '</tr>';
     });
     table += '</tbody></table>';
-
     return table;
 }
 
 function formatStandardTable(data, headers) {
-    const colWidths = {};
     const keyColumns = ['id', 'posicao'];
     let sortedHeaders = headers.filter(h => !keyColumns.includes(h));
-    keyColumns.reverse().forEach(key => {
-        if (headers.includes(key)) { sortedHeaders.unshift(key); }
-    });
-
-    sortedHeaders.forEach(header => {
-        colWidths[header] = formatHeader(header).length;
-    });
-
-    data.forEach(row => {
-        sortedHeaders.forEach(header => {
-            const val = formatDataCell(row[header]);
-            if (val.length > colWidths[header]) {
-                colWidths[header] = val.length;
-            }
-        });
-    });
-
-    let table = '<table class="data-table">';
-
-    table += '<thead><tr>';
-    sortedHeaders.forEach(header => {
-        const cleanHeader = formatHeader(header);
-        table += `<th>${cleanHeader}</th>`;
-    });
-    table += '</tr></thead>';
-
-    table += '<tbody>';
+    keyColumns.reverse().forEach(key => { if (headers.includes(key)) sortedHeaders.unshift(key); });
+    let table = '<table class="data-table"><thead><tr>';
+    sortedHeaders.forEach(header => table += `<th>${formatHeader(header)}</th>`);
+    table += '</tr></thead><tbody>';
     data.forEach(row => {
         table += '<tr>';
-        sortedHeaders.forEach(header => {
-            const val = formatDataCell(row[header]);
-            table += `<td>${val}</td>`;
-        });
+        sortedHeaders.forEach(header => table += `<td>${formatDataCell(row[header])}</td>`);
         table += '</tr>';
     });
     table += '</tbody></table>';
-
     return table;
 }
 
@@ -180,12 +161,10 @@ async function initializeGame() {
         const data = await response.json();
         if (data.narrative) {
             introText = data.narrative;
-            outputEl.innerHTML = '';
-            appendOutput(`➤ ${introText}`, 'narrative');
+            queueMessage(`➤ ${introText}`, 'narrative');
         }
-    } catch (err) {
-        outputEl.innerHTML = '';
-        appendOutput(`➤ ERRO DE CONEXÃO: Não foi possível carregar o caso.`, 'error');
+    } catch {
+        queueMessage(`➤ ERRO DE CONEXÃO: Não foi possível carregar o caso.`, 'error');
     }
 }
 
