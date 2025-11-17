@@ -101,28 +101,51 @@ function processQueue() {
 
 function typewriter(element, text, callback) {
     let i = 0;
+    let plainText = text.replace(/<[^>]+>/g, ""); // remove tags temporariamente
+    let html = text;
+
+    element.innerHTML = html;
+    element.style.visibility = "hidden";
+
+    let overlay = document.createElement("span");
+    overlay.style.position = "absolute";
+    overlay.style.whiteSpace = "pre-wrap";
+    overlay.style.pointerEvents = "none";
+    overlay.style.color = "inherit";
+    overlay.textContent = "";
+    element.parentNode.appendChild(overlay);
+
     inputEl.disabled = true;
     isSkipping = false;
 
     function type() {
         if (isSkipping) {
-            element.innerHTML = text;
-            i = text.length;
-            isSkipping = false;
+            overlay.textContent = plainText;
+            finish();
+            return;
         }
-        if (i < text.length) {
-            element.innerHTML += text.charAt(i);
+
+        if (i < plainText.length) {
+            overlay.textContent += plainText.charAt(i);
             i++;
             scrollToBottom();
             setTimeout(type, TYPE_SPEED);
         } else {
-            inputEl.disabled = false;
-            inputEl.focus();
-            callback();
+            finish();
         }
     }
+
+    function finish() {
+        overlay.remove();
+        element.style.visibility = "visible";
+        inputEl.disabled = false;
+        inputEl.focus();
+        callback();
+    }
+
     type();
 }
+
 
 function scrollToBottom() {
     outputEl.scrollTop = outputEl.scrollHeight;

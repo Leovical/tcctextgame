@@ -27,7 +27,7 @@ ACESSO BLOQUEADO.
 
 Seu primeiro caso oficial no DITEC. E tinha que ser logo o de Marcos, o DBA Chefe. O melhor analista que a agência tinha.
 
-A perícia já foi. Levaram o corpo, mas a sala ainda cheira a café frio e ao ozônio fraco dos servidores ligados.
+A perícia já fez o grosso do trabalho, mas o corpo ainda está ali, cercado por fita zebrada. Deixaram você examinar a sala — e o que puder do corpo — antes de removê-lo. Você não tem muito tempo. A sala ainda cheira a café frio e ao ozônio fraco dos servidores ligados.
 
 O computador dele é a chave, mas as perguntas de segurança são pessoais, quase íntimas. 'Qual o nome da sua primeira gata?' 'Bebida favorita do seu melhor amigo?'
 
@@ -313,8 +313,9 @@ Fechada na mão esquerda da vítima, uma pequena mecha de cabelo. Loiro, tingido
 
 	case "OLHAR CHÃO":
 		if puzzleState < 5 {
-			return core.GameResponse{Narrative: "Chão empoeirado, exceto pela área onde o corpo estava. Nenhum detalhe visível."}, puzzleState, currentFocus
+			return core.GameResponse{Narrative: "O chão é empoeirado, mas a área ao redor do corpo está isolada por fita zebrada. À distância, nenhum detalhe chama atenção."}, puzzleState, currentFocus
 		}
+
 		if puzzleState > 5 {
 			return core.GameResponse{Narrative: "A perícia já marcou o contorno da pegada tamanho 42 no chão."}, puzzleState, currentFocus
 		}
@@ -382,7 +383,7 @@ Dentro dele, uma planilha interna com a lista completa de funcionários do DITEC
 
 (Tabela 'funcionarios' desbloqueada)
 
-Agora que você tem a lista de funcionários, pode começar a cruzar os dados com as provas. Falando em provas... talvez seja hora de reexaminar a cena do crime, começando pelo **corpo**.
+Agora que você tem a lista de funcionários, pode começar a cruzar os dados com as provas. Falando em provas... talvez seja hora de reexaminar a cena do crime, começando pelo <strong>corpo</strong>.
 
 (Puzzle 4 desbloqueado)
 `
@@ -459,7 +460,7 @@ BINGO!
 As associações na tabela 'pistas_logicas' finalmente fazem sentido. No monitor, o pequeno quadro de lógica de Marcos se completa como ele teria gostado: elegante e sem contradições.
 Uma luz verde acende no canto da tela. O sistema libera o próximo passo.
 
-Enquanto você anota suas descobertas, um <i>clique</i> baixo, mas distinto, soa da direção da **estante** de livros.
+Enquanto você anota suas descobertas, um <i>clique</i> baixo, mas distinto, soa da direção da <strong>estante</strong> de livros.
 
 (Puzzle 2 desbloqueado)
 `
