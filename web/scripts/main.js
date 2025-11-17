@@ -88,12 +88,12 @@ function typewriter(element, text, callback) {
 
     function type() {
         if (isSkipping) {
-            element.textContent = text;
+            element.innerHTML = text;
             i = text.length;
             isSkipping = false;
         }
         if (i < text.length) {
-            element.textContent += text.charAt(i);
+            element.innerHTML += text.charAt(i);
             i++;
             scrollToBottom();
             setTimeout(type, TYPE_SPEED);
