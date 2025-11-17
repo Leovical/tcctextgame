@@ -28,9 +28,10 @@ inputEl.addEventListener('keydown', async (event) => {
 
         if (commandLower === 'clear' || commandLower === 'limpar' || commandLower === 'cls') {
             outputEl.innerHTML = '';
-            queueMessage(`➤ ${introText}`, 'narrative');
+            await reloadCurrentNarrative();
             return;
         }
+
 
         queueMessage(`\n> ${command}`, 'prompt');
 
@@ -58,6 +59,23 @@ function queueMessage(content, type) {
     messageQueue.push({ content, type });
     processQueue();
 }
+
+async function reloadCurrentNarrative() {
+    try {
+        const response = await fetch('/api/execute-sql', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sql: "START_GAME" }),
+        });
+
+        const data = await response.json();
+        if (data.narrative) queueMessage(`➤ ${data.narrative}`, 'narrative');
+
+    } catch (err) {
+        queueMessage(`➤ ERRO: ${err.message}`, 'error');
+    }
+}
+
 
 function processQueue() {
     if (isTyping || messageQueue.length === 0) return;
