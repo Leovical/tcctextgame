@@ -233,3 +233,24 @@ body {
     color: #ff4141;
     text-shadow: 0 0 5px rgba(255, 65, 65, 0.5);
 }
+
+.typewriter-wrapper {
+    position: relative;
+    margin-top: 10px;
+}
+
+.typewriter-ghost {
+    visibility: hidden;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 0;
+}
+
+.typewriter-visible {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 0;
+}

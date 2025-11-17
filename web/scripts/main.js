@@ -82,70 +82,83 @@ function processQueue() {
 
     isTyping = true;
     const message = messageQueue.shift();
-    const pre = document.createElement('pre');
-    pre.className = message.type;
-    outputEl.appendChild(pre);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'output-block typewriter-wrapper';
 
     if (message.type === 'data') {
-        pre.innerHTML = message.content;
+        const block = document.createElement('pre');
+        block.className = message.type;
+        block.innerHTML = message.content;
+        const shouldAutoScroll = isUserAtBottom();
+
+        wrapper.appendChild(block);
+        outputEl.appendChild(wrapper);
+        if (shouldAutoScroll) {
+            outputEl.scrollTop = outputEl.scrollHeight;
+        }
+
         scrollToBottom();
         isTyping = false;
         processQueue();
-    } else {
-        typewriter(pre, message.content, () => {
-            isTyping = false;
-            processQueue();
-        });
+        return;
     }
+
+    const ghost = document.createElement('pre');
+    ghost.className = `typewriter-ghost ${message.type}`;
+    ghost.innerHTML = message.content;
+
+    const visible = document.createElement('pre');
+    visible.className = `typewriter-visible ${message.type}`;
+    visible.textContent = "";
+
+    wrapper.appendChild(ghost);
+    wrapper.appendChild(visible);
+    outputEl.appendChild(wrapper);
+
+    typewriter(visible, ghost, message.content, () => {
+        isTyping = false;
+        processQueue();
+    });
 }
 
-function typewriter(element, text, callback) {
+function typewriter(visibleEl, ghostEl, fullHtml, callback) {
     let i = 0;
-    let plainText = text.replace(/<[^>]+>/g, ""); // remove tags temporariamente
-    let html = text;
-
-    element.innerHTML = html;
-    element.style.visibility = "hidden";
-
-    let overlay = document.createElement("span");
-    overlay.style.position = "absolute";
-    overlay.style.whiteSpace = "pre-wrap";
-    overlay.style.pointerEvents = "none";
-    overlay.style.color = "inherit";
-    overlay.textContent = "";
-    element.parentNode.appendChild(overlay);
-
-    inputEl.disabled = true;
+    let plainText = fullHtml.replace(/<[^>]+>/g, "");
     isSkipping = false;
 
-    function type() {
+    inputEl.disabled = true;
+
+    function tick() {
         if (isSkipping) {
-            overlay.textContent = plainText;
+            visibleEl.innerHTML = fullHtml;
             finish();
             return;
         }
 
         if (i < plainText.length) {
-            overlay.textContent += plainText.charAt(i);
+            visibleEl.textContent = plainText.slice(0, i + 1);
             i++;
-            scrollToBottom();
-            setTimeout(type, TYPE_SPEED);
+            followScroll();
+            setTimeout(tick, TYPE_SPEED);
         } else {
             finish();
         }
     }
 
     function finish() {
-        overlay.remove();
-        element.style.visibility = "visible";
+        visibleEl.innerHTML = fullHtml;
+        ghostEl.remove();
+        visibleEl.classList.remove("typewriter-visible");
+        visibleEl.style.position = "static";
         inputEl.disabled = false;
         inputEl.focus();
+        followScroll();
         callback();
     }
 
-    type();
+    tick();
 }
-
 
 function scrollToBottom() {
     outputEl.scrollTop = outputEl.scrollHeight;
@@ -224,5 +237,16 @@ function formatHeader(s) {
     if (typeof s !== 'string') return '';
     return s.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 }
+
+function isUserAtBottom() {
+    const threshold = 20;
+    return outputEl.scrollHeight - outputEl.scrollTop - outputEl.clientHeight < threshold;
+}
+function followScroll() {
+    if (isUserAtBottom()) {
+        outputEl.scrollTop = outputEl.scrollHeight;
+    }
+}
+
 
 initializeGame();

@@ -203,7 +203,7 @@ Comandos SQL:
 		helpText += "Nenhuma tabela de puzzle ativa no momento."
 	}
 
-	return core.GameResponse{Narrative: helpText}
+	return core.GameResponse{Narrative: cleanText(helpText)}
 }
 
 func (c *Case1) handleGameCommand(command string, dbm *db.DBManager, puzzleState int, currentFocus string) (core.GameResponse, int, string) {
@@ -219,7 +219,7 @@ func (c *Case1) handleGameCommand(command string, dbm *db.DBManager, puzzleState
 			return core.GameResponse{Narrative: "Você não está focado em nada."}, puzzleState, "none"
 		}
 		narrative := fmt.Sprintf("Você para de examinar %s.", currentFocus)
-		return core.GameResponse{Narrative: narrative}, puzzleState, "none"
+		return core.GameResponse{Narrative: cleanText(narrative)}, puzzleState, "none"
 
 	case "OLHAR QUADRO":
 		if puzzleState != 1 {
@@ -251,7 +251,7 @@ Mas... e as categorias? Os nomes, as profissões... Conhecendo o Marcos, ele nã
 Um DBA de verdade armazena dados de forma estruturada. Ele deve ter criado tabelas de consulta para o 'universo' do jogo.
 Vou precisar consultar o banco para ver todas as opções disponíveis. Talvez uma tabela 'opcoes'?
 `
-		return core.GameResponse{Narrative: narrative}, puzzleState, newFocus
+		return core.GameResponse{Narrative: cleanText(narrative)}, puzzleState, newFocus
 
 	case "OLHAR ESTANTE":
 		if puzzleState < 2 {
@@ -271,7 +271,7 @@ Deve haver alguma ordem escondida.
 
 Vou consultar a tabela 'livros' para ver os metadados.
 `
-		return core.GameResponse{Narrative: narrative}, puzzleState, newFocus
+		return core.GameResponse{Narrative: cleanText(narrative)}, puzzleState, newFocus
 
 	case "OLHAR COMPUTADOR":
 		if puzzleState < 2 {
@@ -291,7 +291,7 @@ Tudo parece... normal. Trabalho, trabalho e mais trabalho.
 
 Se Marcos tinha segredos, ele não os guardava no drive principal. Ele era um DBA paranoico demais para isso. Deve haver um dispositivo externo.
 `
-		return core.GameResponse{Narrative: narrative}, puzzleState, newFocus
+		return core.GameResponse{Narrative: cleanText(narrative)}, puzzleState, newFocus
 
 	case "OLHAR CORPO":
 		if puzzleState < 4 {
@@ -309,7 +309,7 @@ Fechada na mão esquerda da vítima, uma pequena mecha de cabelo. Loiro, tingido
 
 É a nossa primeira pista real. Preciso cruzar isso com a lista de funcionários.
 `
-		return core.GameResponse{Narrative: narrative}, puzzleState, newFocus
+		return core.GameResponse{Narrative: cleanText(narrative)}, puzzleState, newFocus
 
 	case "OLHAR CHÃO":
 		if puzzleState < 5 {
@@ -329,7 +329,7 @@ A perícia acabou de ligar: a estimativa é tamanho 42.
 
 Isso deve reduzir a lista de suspeitos.
 `
-		return core.GameResponse{Narrative: narrative}, puzzleState, newFocus
+		return core.GameResponse{Narrative: cleanText(narrative)}, puzzleState, newFocus
 
 	case "OLHAR SOFÁ":
 		if puzzleState < 6 {
@@ -350,7 +350,7 @@ O nome me dá um arrepio. 'PANTERA'.
 
 O assassino tinha acesso a ele.
 `
-		return core.GameResponse{Narrative: narrative}, puzzleState, newFocus
+		return core.GameResponse{Narrative: cleanText(narrative)}, puzzleState, newFocus
 
 	default:
 		return core.GameResponse{Narrative: "Comando não reconhecido: " + command}, puzzleState, currentFocus
@@ -389,7 +389,7 @@ Agora que você tem a lista de funcionários, pode começar a cruzar os dados co
 `
 			newPuzzleState = 4
 			newFocus = "none"
-			return core.GameResponse{Narrative: narrative}, newPuzzleState, newFocus
+			return core.GameResponse{Narrative: cleanText(narrative)}, newPuzzleState, newFocus
 		} else {
 			narrative = `
 A senha que você digitou não corresponde a nenhuma entrada válida.
@@ -420,7 +420,7 @@ CASO FECHADO. (FIM DA FASE 1)
 `
 			newPuzzleState = 7
 			newFocus = "none"
-			return core.GameResponse{Narrative: narrative}, newPuzzleState, newFocus
+			return core.GameResponse{Narrative: cleanText(narrative)}, newPuzzleState, newFocus
 		} else {
 			narrative = `
 Os resultados aparecem na tela, mas algo não fecha.
@@ -430,45 +430,38 @@ Você sabe que precisa cruzar melhor as tabelas 'suspeitos', 'funcionarios', 'pr
 		}
 	}
 
-	return core.GameResponse{Narrative: narrative, Data: results}, newPuzzleState, newFocus
+	return core.GameResponse{Narrative: cleanText(narrative), Data: results}, newPuzzleState, newFocus
 }
 
 func (c *Case1) handleExecStatement(query string, dbm *db.DBManager, puzzleState int, currentFocus string) (core.GameResponse, int, string) {
 	upperQuery := strings.ToUpper(strings.TrimSpace(query))
 
-	// 1) GATES DE FOCO ANTES DE QUALQUER ALTERAÇÃO NO BANCO
 	switch puzzleState {
 	case 1:
-		// Puzzle 1: só faz sentido validar UPDATE/INSERT em pistas_logicas se estiver olhando o quadro
 		if (strings.HasPrefix(upperQuery, "UPDATE") || strings.HasPrefix(upperQuery, "INSERT")) && currentFocus != "quadro" {
 			return core.GameResponse{Error: "Você precisa 'OLHAR QUADRO' antes de tentar adivinhar a solução."}, puzzleState, currentFocus
 		}
 
 	case 2:
-		// Puzzle 2: reorganizar livros só se estiver olhando a estante
 		if (strings.HasPrefix(upperQuery, "UPDATE") || strings.HasPrefix(upperQuery, "INSERT")) && currentFocus != "estante" {
 			return core.GameResponse{Error: "Você precisa 'OLHAR ESTANTE' antes de tentar organizá-la."}, puzzleState, currentFocus
 		}
 
 	case 4:
-		// Puzzle 4: qualquer alteração na tabela de suspeitos exige foco no corpo
 		if (strings.HasPrefix(upperQuery, "INSERT") || strings.HasPrefix(upperQuery, "DELETE") || strings.HasPrefix(upperQuery, "UPDATE")) && currentFocus != "corpo" {
 			return core.GameResponse{Error: "Você precisa 'OLHAR CORPO' para saber quem adicionar à lista de suspeitos."}, puzzleState, currentFocus
 		}
 
 	case 5:
-		// Puzzle 5: filtro com DELETE em suspeitos só se estiver olhando o chão
 		if strings.HasPrefix(upperQuery, "DELETE") && currentFocus != "chao" {
 			return core.GameResponse{Error: "Você precisa 'OLHAR CHÃO' para saber qual pegada usar como filtro."}, puzzleState, currentFocus
 		}
 	}
 
-	// 2) CHECAGEM DE SEGURANÇA (DROP/TRUNCATE/etc.)
 	if err := c.checkSafeQuery(query); err != nil {
 		return core.GameResponse{Error: err.Error()}, puzzleState, currentFocus
 	}
 
-	// 3) EXECUTA A QUERY (AGORA SIM)
 	result, err := dbm.ExecuteQueryPlayer(query)
 	if err != nil {
 		return core.GameResponse{Error: err.Error()}, puzzleState, currentFocus
@@ -479,10 +472,8 @@ func (c *Case1) handleExecStatement(query string, dbm *db.DBManager, puzzleState
 	newPuzzleState := puzzleState
 	newFocus := currentFocus
 
-	// 4) LÓGICA DE PROGRESSÃO DOS PUZZLES
 	switch puzzleState {
 	case 1:
-		// Já garantimos o foco lá em cima, então não precisa checar de novo aqui
 		if c.checkPuzzle1(dbm) {
 			narrative = `
 BINGO!
@@ -501,7 +492,6 @@ Enquanto você anota suas descobertas, um <i>clique</i> baixo, mas distinto, soa
 		}
 
 	case 2:
-		// Foco também já foi validado antes
 		if c.checkPuzzle2(dbm) {
 			narrative = `
 CLIQUE.
@@ -522,7 +512,6 @@ Está protegido por senha, mas há um arquivo 'anotacoes.txt' visível:
 		}
 
 	case 4:
-		// Aqui também, o foco já foi validado
 		if c.checkPuzzle4(dbm) {
 			narrative = `
 Você fecha mais uma query e observa a nova tabela de 'suspeitos'. 
@@ -537,7 +526,6 @@ Ao se levantar, você quase pisa em algo. No <strong>chão</strong>, perto de on
 		}
 
 	case 5:
-		// Foco em 'chao' já foi garantido
 		if c.checkPuzzle5(dbm) {
 			narrative = `
 Um DELETE bem aplicado e a lista de suspeitos encolhe ainda mais. 
@@ -553,7 +541,7 @@ Você se senta no velho <strong>sofá</strong> para pensar e sua mão bate em um
 		}
 	}
 
-	return core.GameResponse{Narrative: narrative}, newPuzzleState, newFocus
+	return core.GameResponse{Narrative: cleanText(narrative)}, newPuzzleState, newFocus
 }
 
 func (c *Case1) checkSafeQuery(query string) error {
@@ -770,4 +758,8 @@ func (c *Case1) checkPuzzle6(results []map[string]interface{}, columns []string,
 		}
 	}
 	return false
+}
+
+func cleanText(s string) string {
+	return strings.TrimLeft(s, "\n\r\t ")
 }
