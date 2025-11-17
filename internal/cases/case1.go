@@ -434,10 +434,41 @@ Você sabe que precisa cruzar melhor as tabelas 'suspeitos', 'funcionarios', 'pr
 }
 
 func (c *Case1) handleExecStatement(query string, dbm *db.DBManager, puzzleState int, currentFocus string) (core.GameResponse, int, string) {
+	upperQuery := strings.ToUpper(strings.TrimSpace(query))
+
+	// 1) GATES DE FOCO ANTES DE QUALQUER ALTERAÇÃO NO BANCO
+	switch puzzleState {
+	case 1:
+		// Puzzle 1: só faz sentido validar UPDATE/INSERT em pistas_logicas se estiver olhando o quadro
+		if (strings.HasPrefix(upperQuery, "UPDATE") || strings.HasPrefix(upperQuery, "INSERT")) && currentFocus != "quadro" {
+			return core.GameResponse{Error: "Você precisa 'OLHAR QUADRO' antes de tentar adivinhar a solução."}, puzzleState, currentFocus
+		}
+
+	case 2:
+		// Puzzle 2: reorganizar livros só se estiver olhando a estante
+		if (strings.HasPrefix(upperQuery, "UPDATE") || strings.HasPrefix(upperQuery, "INSERT")) && currentFocus != "estante" {
+			return core.GameResponse{Error: "Você precisa 'OLHAR ESTANTE' antes de tentar organizá-la."}, puzzleState, currentFocus
+		}
+
+	case 4:
+		// Puzzle 4: qualquer alteração na tabela de suspeitos exige foco no corpo
+		if (strings.HasPrefix(upperQuery, "INSERT") || strings.HasPrefix(upperQuery, "DELETE") || strings.HasPrefix(upperQuery, "UPDATE")) && currentFocus != "corpo" {
+			return core.GameResponse{Error: "Você precisa 'OLHAR CORPO' para saber quem adicionar à lista de suspeitos."}, puzzleState, currentFocus
+		}
+
+	case 5:
+		// Puzzle 5: filtro com DELETE em suspeitos só se estiver olhando o chão
+		if strings.HasPrefix(upperQuery, "DELETE") && currentFocus != "chao" {
+			return core.GameResponse{Error: "Você precisa 'OLHAR CHÃO' para saber qual pegada usar como filtro."}, puzzleState, currentFocus
+		}
+	}
+
+	// 2) CHECAGEM DE SEGURANÇA (DROP/TRUNCATE/etc.)
 	if err := c.checkSafeQuery(query); err != nil {
 		return core.GameResponse{Error: err.Error()}, puzzleState, currentFocus
 	}
 
+	// 3) EXECUTA A QUERY (AGORA SIM)
 	result, err := dbm.ExecuteQueryPlayer(query)
 	if err != nil {
 		return core.GameResponse{Error: err.Error()}, puzzleState, currentFocus
@@ -448,11 +479,10 @@ func (c *Case1) handleExecStatement(query string, dbm *db.DBManager, puzzleState
 	newPuzzleState := puzzleState
 	newFocus := currentFocus
 
+	// 4) LÓGICA DE PROGRESSÃO DOS PUZZLES
 	switch puzzleState {
 	case 1:
-		if currentFocus != "quadro" {
-			return core.GameResponse{Error: "Você precisa 'OLHAR QUADRO' antes de tentar adivinhar a solução."}, puzzleState, currentFocus
-		}
+		// Já garantimos o foco lá em cima, então não precisa checar de novo aqui
 		if c.checkPuzzle1(dbm) {
 			narrative = `
 BINGO!
@@ -471,9 +501,7 @@ Enquanto você anota suas descobertas, um <i>clique</i> baixo, mas distinto, soa
 		}
 
 	case 2:
-		if currentFocus != "estante" {
-			return core.GameResponse{Error: "Você precisa 'OLHAR ESTANTE' antes de tentar organizá-la."}, puzzleState, currentFocus
-		}
+		// Foco também já foi validado antes
 		if c.checkPuzzle2(dbm) {
 			narrative = `
 CLIQUE.
@@ -494,9 +522,7 @@ Está protegido por senha, mas há um arquivo 'anotacoes.txt' visível:
 		}
 
 	case 4:
-		if currentFocus != "corpo" {
-			return core.GameResponse{Error: "Você precisa 'OLHAR CORPO' para saber quem adicionar à lista de suspeitos."}, puzzleState, currentFocus
-		}
+		// Aqui também, o foco já foi validado
 		if c.checkPuzzle4(dbm) {
 			narrative = `
 Você fecha mais uma query e observa a nova tabela de 'suspeitos'. 
@@ -511,9 +537,7 @@ Ao se levantar, você quase pisa em algo. No <strong>chão</strong>, perto de on
 		}
 
 	case 5:
-		if currentFocus != "chao" {
-			return core.GameResponse{Error: "Você precisa 'OLHAR CHÃO' para saber qual pegada usar como filtro."}, puzzleState, currentFocus
-		}
+		// Foco em 'chao' já foi garantido
 		if c.checkPuzzle5(dbm) {
 			narrative = `
 Um DELETE bem aplicado e a lista de suspeitos encolhe ainda mais. 
