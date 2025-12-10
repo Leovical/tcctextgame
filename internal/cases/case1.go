@@ -16,6 +16,10 @@ func (c *Case1) GetID() string {
 	return "caso_1"
 }
 
+func (c *Case1) getInteractables() []string {
+	return []string{"QUADRO", "ESTANTE", "COMPUTADOR", "CORPO", "CHÃO", "SOFÁ"}
+}
+
 func (c *Case1) GetLoadNarrative(puzzleState int) string {
 	switch puzzleState {
 	case 1:
@@ -172,55 +176,107 @@ func (c *Case1) ProcessCommand(command string, dbm *db.DBManager, puzzleState in
 	}
 }
 
-func (c *Case1) getHelp(puzzleState int) core.GameResponse {
-	helpText := `
+func (c *Case1) getHelp(puzzleState int, topic string) core.GameResponse {
+	if topic != "" {
+		return c.getSpecificHelp(topic)
+	}
+
+	validObjects := strings.Join(c.getInteractables(), ", ")
+
+	helpText := fmt.Sprintf(`
 Comandos de Jogo Disponíveis:
-- AJUDA: Mostra esta mensagem.
-- OLHAR [NOME]: Interage com um objeto da sala (QUADRO, ESTANTE, COMPUTADOR, CORPO, CHÃO, SOFÁ).
+- AJUDA [COMANDO]: Mostra esta lista ou detalhes (ex: AJUDA SELECT).
+- OLHAR [NOME]: Interage com um objeto da sala (%s).
 - LIMPAR (ou CLS): Limpa a tela.
 - RESET: Reinicia o caso (pedirá confirmação).
 
 Comandos SQL:
 - SELECT, UPDATE, INSERT, DELETE
+- Funções úteis: REPLACE()
 
 ---
-`
+`, validObjects)
+
+	helpText += "Tabelas Relevantes (Etapa Atual):\n"
 
 	switch puzzleState {
 	case 1:
-		helpText += "Tabelas Relevantes (Puzzle 1):\n- pistas_logicas (a tabela principal do puzzle)\n- opcoes (para ver as categorias)"
+		helpText += "- pistas_logicas (a tabela principal do puzzle)\n- opcoes (para ver as categorias)"
 	case 2:
-		helpText += "Tabelas Relevantes (Puzzle 2):\n- livros"
+		helpText += "- livros (metadados da estante)"
 	case 3:
-		helpText += "Tabelas Relevantes (Puzzle 3):\n- senhas_codificadas\n- projetos"
+		helpText += "- senhas_codificadas (para ver a string suja)\n- projetos (nomes dos projetos)"
 	case 4:
-		helpText += "Tabelas Relevantes (Puzzle 4):\n- funcionarios\n- suspeitos"
+		helpText += "- funcionarios (lista completa)\n- suspeitos (sua lista de trabalho)"
 	case 5:
-		helpText += "Tabelas Relevantes (Puzzle 5):\n- funcionarios\n- suspeitos"
+		helpText += "- funcionarios\n- suspeitos (filtre pelos loiros)"
 	case 6:
-		helpText += "Tabelas Relevantes (Puzzle 6):\n- suspeitos\n- funcionarios\n- projetos_funcionarios\n- projetos"
+		helpText += "- suspeitos\n- funcionarios\n- projetos_funcionarios\n- projetos"
 	default:
-		helpText += "Nenhuma tabela de puzzle ativa no momento."
+		helpText += "Nenhuma tabela específica necessária agora."
 	}
 
 	return core.GameResponse{Narrative: cleanText(helpText)}
 }
 
+func (c *Case1) getSpecificHelp(topic string) core.GameResponse {
+	switch topic {
+	case "SELECT":
+		return core.GameResponse{Narrative: "SELECT: Usa-se para ler dados.\nEx: SELECT * FROM funcionarios WHERE nome = 'Pedro';"}
+	case "UPDATE":
+		return core.GameResponse{Narrative: "UPDATE: Altera dados existentes.\nEx: UPDATE pistas_logicas SET casa = 'Azul' WHERE posicao = 1;"}
+	case "INSERT":
+		return core.GameResponse{Narrative: "INSERT: Adiciona novos dados.\nEx: INSERT INTO suspeitos (nome) VALUES ('Lucas');"}
+	case "DELETE":
+		return core.GameResponse{Narrative: "DELETE: Remove dados.\nEx: DELETE FROM suspeitos WHERE id = 1;"}
+
+	case "REPLACE":
+		return core.GameResponse{Narrative: "REPLACE(texto, de, para): Função usada DENTRO do SELECT para substituir caracteres.\nMuito útil para decodificar strings.\nEx: SELECT REPLACE(senha, '4', 'A') FROM senhas_codificadas;"}
+
+	case "OLHAR":
+		objs := strings.Join(c.getInteractables(), ", ")
+		return core.GameResponse{Narrative: fmt.Sprintf("OLHAR: Permite examinar pistas físicas na sala.\nObjetos visíveis agora: %s", objs)}
+	default:
+		return core.GameResponse{Narrative: fmt.Sprintf("Não há ajuda específica para '%s'. Tente apenas AJUDA.", topic)}
+	}
+}
+
 func (c *Case1) handleGameCommand(command string, dbm *db.DBManager, puzzleState int, currentFocus string) (core.GameResponse, int, string) {
-	upperCommand := strings.ToUpper(command)
+	upperCommand := strings.ToUpper(strings.TrimSpace(command))
+	parts := strings.Fields(upperCommand)
+	rootCmd := ""
+	if len(parts) > 0 {
+		rootCmd = parts[0]
+	}
+
 	newFocus := currentFocus
 
-	switch upperCommand {
+	switch rootCmd {
 	case "AJUDA", "HELP", "/AJUDA", "/HELP":
-		return c.getHelp(puzzleState), puzzleState, currentFocus
+		topic := ""
+		if len(parts) > 1 {
+			topic = parts[1]
+		}
+		return c.getHelp(puzzleState, topic), puzzleState, currentFocus
 
-	case "SAIR", "FECHAR", "PARAR DE OLHAR":
+	case "SAIR", "FECHAR", "PARAR":
+		if len(parts) > 2 && parts[1] == "DE" && parts[2] == "OLHAR" {
+		}
+
 		if currentFocus == "none" {
 			return core.GameResponse{Narrative: "Você não está focado em nada."}, puzzleState, "none"
 		}
 		narrative := fmt.Sprintf("Você para de examinar %s.", currentFocus)
 		return core.GameResponse{Narrative: cleanText(narrative)}, puzzleState, "none"
 
+	case "OLHAR":
+		if len(parts) == 1 {
+			objs := strings.Join(c.getInteractables(), ", ")
+			return core.GameResponse{Narrative: fmt.Sprintf("Você olha ao redor. Objetos visíveis: %s", objs)}, puzzleState, currentFocus
+		}
+	}
+
+	switch upperCommand {
 	case "OLHAR QUADRO":
 		if puzzleState != 1 {
 			return core.GameResponse{Narrative: "Você já resolveu o quebra-cabeça. As anotações de Marcos não fazem mais sentido."}, puzzleState, currentFocus
@@ -315,7 +371,6 @@ Fechada na mão esquerda da vítima, uma pequena mecha de cabelo. Loiro, tingido
 		if puzzleState < 5 {
 			return core.GameResponse{Narrative: "O chão é empoeirado, mas a área ao redor do corpo está isolada por fita zebrada. À distância, nenhum detalhe chama atenção."}, puzzleState, currentFocus
 		}
-
 		if puzzleState > 5 {
 			return core.GameResponse{Narrative: "A perícia já marcou o contorno da pegada tamanho 42 no chão."}, puzzleState, currentFocus
 		}
@@ -548,15 +603,15 @@ func (c *Case1) checkSafeQuery(query string) error {
 	upper := strings.ToUpper(strings.TrimSpace(query))
 
 	if strings.HasPrefix(upper, "DROP") || strings.HasPrefix(upper, "TRUNCATE") || strings.HasPrefix(upper, "ALTER") {
-		return fmt.Errorf("Comando perigoso bloqueado. Foque no caso, detetive.")
+		return fmt.Errorf("comando perigoso bloqueado, foque no caso detetive")
 	}
 
 	if strings.HasPrefix(upper, "DELETE") && !strings.Contains(upper, "DELETE FROM SUSPEITOS") {
-		return fmt.Errorf("Comando perigoso bloqueado. Você só pode deletar da tabela 'suspeitos'.")
+		return fmt.Errorf("comando perigoso bloqueado, você só pode deletar da tabela 'suspeitos'")
 	}
 
 	if strings.HasPrefix(upper, "UPDATE") && !(strings.Contains(upper, "UPDATE PISTAS_LOGICAS") || strings.Contains(upper, "UPDATE LIVROS")) {
-		return fmt.Errorf("Comando perigoso bloqueado. Você não pode alterar esta tabela.")
+		return fmt.Errorf("comando perigoso bloqueado, você não pode alterar esta tabela")
 	}
 
 	return nil

@@ -3,31 +3,53 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Casos de Código - Jogo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Casos de Código</title>
     <link rel="stylesheet" href="./styles/main.css">
 </head>
 
 <body>
-    <div class="texture-overlay"></div>
 
-    <div class="terminal-container">
+    <div class="container">
+        <div class="computer-container">
+            <div class="monitor">
+                <div class="monitor-inner">
+                    <div class="screen-container">
 
-        <div class="screen-content">
-            <div id="case-title">CASO 1</div>
-            <div id="output"></div>
-        </div>
+                        <div class="screen screen-off" id="game-screen-area">
+                            <div class="scanlines"></div>
+                            <div class="glow-overlay"></div>
 
+                            <div class="game-interface">
+                                <div id="case-title">CASO 1</div>
+                                <div id="output"></div>
+                            </div>
 
-        <div class="input-section">
-            <div class="prompt-bar">/prompt</div>
-            <div class="input-box">
-                <input type="text" id="command-input" autofocus autocomplete="off">
+                            <div class="input-wrapper" id="input-area">
+                                <div class="prompt-label">/prompt</div>
+                                <input type="text" id="command-input" autocomplete="off" spellcheck="false">
+                                <button id="submit-btn" title="Enviar / Pular Texto">↵</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="monitor-bottom">
+                    <div class="power-switch" id="power-btn-container">
+                        <div class="button"></div>
+                    </div>
+                    <div class="power-led" id="power-led"></div>
+                </div>
             </div>
+
         </div>
     </div>
 
-    <audio id="music-loop" src="./audio/music-loop.mp3" autoplay loop volume="0.3"></audio>
+    <button id="mobile-power-btn">LIGAR TERMINAL</button>
+
+    <audio id="music-loop" src="./audio/music-loop.mp3" loop volume="0.3"></audio>
+    <audio id="sfx-power" src="./audio/crt-switch.mp3"></audio>
 
     <script src="scripts/main.js"></script>
 </body>
