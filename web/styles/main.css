@@ -189,7 +189,6 @@ body {
     transform: translate(0.2vh, -0.4vh);
 }
 
-
 #mobile-power-btn {
     display: none;
 }
@@ -366,10 +365,6 @@ body {
     margin-bottom: 15px;
 }
 
-#mobile-power-btn {
-    display: none;
-}
-
 @keyframes flicker {
     0% {
         opacity: 0.15;
@@ -487,127 +482,6 @@ body {
     text-shadow: 0 0 3px #ff0000;
 }
 
-/* === MOBILE E RESPONSIVIDADE === */
-@media screen and (max-width: 768px) {
-
-    /* 1. Esconde a parte de baixo física do monitor (botões desktop) */
-    .monitor-bottom {
-        display: none !important;
-    }
-
-    /* 2. Removemos visualmente a carcaça, mas mantemos a estrutura */
-    .monitor,
-    .monitor-inner,
-    .container,
-    .computer-container {
-        width: 100% !important;
-        height: 100% !important;
-        background: none !important;
-        border: none !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    .screen-container {
-        border: none !important;
-        box-shadow: none !important;
-    }
-
-    /* 3. A Tela do Jogo agora é o container principal */
-    .screen {
-        /* Fixa no topo da viewport real */
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        z-index: 100;
-
-        /* Ocupa exatamente a largura e altura VISÍVEL (ignora barra de URL) */
-        width: 100% !important;
-        height: 100svh !important;
-
-        /* Layout Flex para organizar Texto e Input */
-        display: flex !important;
-        flex-direction: column !important;
-
-        background-color: #000;
-        border-radius: 0 !important;
-    }
-
-    /* 4. A área de texto cresce para ocupar o espaço disponível */
-    .game-interface {
-        flex-grow: 1;
-        /* Empurra o input para baixo */
-        height: auto;
-        padding: 15px;
-        font-size: 1rem;
-        padding-bottom: 10px;
-        overflow-y: auto;
-    }
-
-    /* 5. O Input fica no rodapé do Flexbox */
-    .input-wrapper {
-        position: relative !important;
-        /* Volta ao fluxo normal */
-        width: 100%;
-        height: 60px;
-        flex-shrink: 0;
-        /* Não encolhe */
-        z-index: 200;
-        background: #000;
-        border-top: 1px solid var(--phosphor-main);
-
-        /* Garante que não fique grudado demais se houver 'safe area' no iOS */
-        padding-bottom: env(safe-area-inset-bottom);
-    }
-
-    /* Ajustes visuais */
-    #command-input {
-        font-size: 16px;
-        /* Evita zoom no iOS */
-    }
-
-    .prompt-label {
-        font-size: 0.9rem;
-        padding: 2px 5px;
-    }
-
-    #submit-btn {
-        font-size: 2rem;
-        padding: 0 15px;
-    }
-
-    #case-title {
-        font-size: 2rem;
-        margin-top: 10px;
-    }
-
-    /* Botão Power Mobile */
-    #mobile-power-btn {
-        display: block;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        padding: 15px 30px;
-        background: var(--phosphor-main);
-        color: #000;
-        border: 2px solid var(--phosphor-glow);
-        font-family: 'Pixellari', monospace;
-        font-size: 1.2rem;
-        font-weight: bold;
-        z-index: 9999;
-        box-shadow: 0 0 20px var(--phosphor-glow);
-        cursor: pointer;
-        text-transform: uppercase;
-    }
-
-    .screen-on {
-        z-index: 300 !important;
-    }
-}
-
 .schema-hint {
     font-family: 'Courier New', monospace;
     font-size: 0.85rem;
@@ -631,5 +505,111 @@ body {
     50% {
         background-color: #ff0000;
         box-shadow: 0 0 8px #ff0000;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    .monitor-bottom {
+        display: none !important;
+    }
+
+    .monitor,
+    .monitor-inner,
+    .container,
+    .computer-container {
+        width: 100% !important;
+        height: 100% !important;
+        background: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .screen-container {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .screen {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        width: 100% !important;
+        height: auto !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        background-color: #000;
+        border-radius: 0 !important;
+        z-index: 100;
+    }
+
+    .game-interface {
+        flex-grow: 1;
+        height: auto;
+        padding: 15px;
+        font-size: 1rem;
+        padding-bottom: 10px;
+        overflow-y: auto;
+    }
+
+    .input-wrapper {
+        position: relative !important;
+        width: 100%;
+        height: 60px;
+        flex-shrink: 0;
+        z-index: 200;
+        background: #000;
+        border-top: 1px solid var(--phosphor-main);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    #command-input {
+        font-size: 16px;
+    }
+
+    .prompt-label {
+        font-size: 0.9rem;
+        padding: 2px 5px;
+    }
+
+    #submit-btn {
+        font-size: 2rem;
+        padding: 0 15px;
+    }
+
+    #case-title {
+        font-size: 2rem;
+        margin-top: 10px;
+    }
+
+    #mobile-power-btn {
+        display: block;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 15px 30px;
+        background: var(--phosphor-main);
+        color: #000;
+        border: 2px solid var(--phosphor-glow);
+        font-family: 'Pixellari', monospace;
+        font-size: 1.2rem;
+        font-weight: bold;
+        z-index: 9999;
+        box-shadow: 0 0 20px var(--phosphor-glow);
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+
+    .screen-on {
+        z-index: 300 !important;
     }
 }
