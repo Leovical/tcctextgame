@@ -27,6 +27,17 @@
     --phosphor-glow: #33ff00;
 }
 
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    height: 100svh;
+    overflow: hidden;
+    position: fixed;
+}
+
 body {
     background-color: #1a1a1a;
     background-image: radial-gradient(circle, #252525 0%, #0d0d0d 100%);
@@ -231,6 +242,8 @@ body {
     font-size: 1.1rem;
     line-height: 1.5;
     width: 100%;
+    height: 100%;
+    max-height: 100%;
     box-sizing: border-box;
     scrollbar-width: thin;
     scrollbar-color: var(--phosphor-main) #000;
