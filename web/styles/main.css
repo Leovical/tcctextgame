@@ -41,13 +41,11 @@ body {
 body {
     background-color: #1a1a1a;
     background-image: radial-gradient(circle, #252525 0%, #0d0d0d 100%);
-    height: 100vh;
     width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 0;
-    overflow: hidden;
     font-family: 'Courier New', monospace;
 }
 
@@ -191,19 +189,26 @@ body {
     transform: translate(0.2vh, -0.4vh);
 }
 
-.computer-container .monitor .monitor-bottom .power-led {
-    width: 1vh;
-    height: 1vh;
-    background: #333;
-    border-radius: 50%;
-    border: 1px solid var(--monitor-shadow-dark);
-    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.8);
-    transition: all 0.3s;
+
+#mobile-power-btn {
+    display: none;
 }
 
-.computer-container .monitor .monitor-bottom .power-led.on {
+#power-led {
+    width: 1vh;
+    height: 1vh;
+    border-radius: 50%;
+    border: 1px solid var(--monitor-shadow-dark);
+    transition: all 0.3s ease;
+    background-color: #330000;
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.8);
+    animation: blink-standby 3s infinite ease-in-out;
+}
+
+#power-led.on {
     background: #5cef11;
     box-shadow: 0 0 10px #5cef11, inset 0 0 2px rgba(0, 0, 0, 0.2);
+    animation: none;
 }
 
 .scanlines {
@@ -264,6 +269,7 @@ body {
     word-wrap: break-word;
     overflow-wrap: break-word;
     max-width: 100%;
+    padding-bottom: 20px;
 }
 
 .input-wrapper {
@@ -481,27 +487,27 @@ body {
     text-shadow: 0 0 3px #ff0000;
 }
 
+/* === MOBILE E RESPONSIVIDADE === */
 @media screen and (max-width: 768px) {
 
+    /* 1. Esconde a parte de baixo física do monitor (botões desktop) */
+    .monitor-bottom {
+        display: none !important;
+    }
+
+    /* 2. Removemos visualmente a carcaça, mas mantemos a estrutura */
     .monitor,
     .monitor-inner,
-    .monitor-bottom {
+    .container,
+    .computer-container {
         width: 100% !important;
         height: 100% !important;
         background: none !important;
         border: none !important;
         border-radius: 0 !important;
         box-shadow: none !important;
-        position: static !important;
-        transform: none !important;
-    }
-
-    .container,
-    .computer-container {
-        width: 100vw;
-        height: 100vh;
-        padding: 0;
-        margin: 0;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
     .screen-container {
@@ -509,40 +515,62 @@ body {
         box-shadow: none !important;
     }
 
+    /* 3. A Tela do Jogo agora é o container principal */
     .screen {
-        width: 100vw !important;
-        height: 100vh !important;
+        /* Fixa no topo da viewport real */
         position: fixed !important;
         top: 0;
         left: 0;
         z-index: 100;
+
+        /* Ocupa exatamente a largura e altura VISÍVEL (ignora barra de URL) */
+        width: 100% !important;
+        height: 100svh !important;
+
+        /* Layout Flex para organizar Texto e Input */
+        display: flex !important;
+        flex-direction: column !important;
+
+        background-color: #000;
         border-radius: 0 !important;
     }
 
+    /* 4. A área de texto cresce para ocupar o espaço disponível */
     .game-interface {
+        flex-grow: 1;
+        /* Empurra o input para baixo */
+        height: auto;
         padding: 15px;
         font-size: 1rem;
-        padding-bottom: 80px;
+        padding-bottom: 10px;
+        overflow-y: auto;
     }
 
+    /* 5. O Input fica no rodapé do Flexbox */
     .input-wrapper {
-        position: fixed;
-        bottom: 0;
-        left: 0;
+        position: relative !important;
+        /* Volta ao fluxo normal */
         width: 100%;
         height: 60px;
+        flex-shrink: 0;
+        /* Não encolhe */
         z-index: 200;
         background: #000;
         border-top: 1px solid var(--phosphor-main);
+
+        /* Garante que não fique grudado demais se houver 'safe area' no iOS */
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Ajustes visuais */
+    #command-input {
+        font-size: 16px;
+        /* Evita zoom no iOS */
     }
 
     .prompt-label {
         font-size: 0.9rem;
         padding: 2px 5px;
-    }
-
-    #command-input {
-        font-size: 1rem;
     }
 
     #submit-btn {
@@ -555,10 +583,7 @@ body {
         margin-top: 10px;
     }
 
-    .monitor-bottom {
-        display: none !important;
-    }
-
+    /* Botão Power Mobile */
     #mobile-power-btn {
         display: block;
         position: fixed;
@@ -572,9 +597,10 @@ body {
         font-family: 'Pixellari', monospace;
         font-size: 1.2rem;
         font-weight: bold;
-        z-index: 200;
+        z-index: 9999;
         box-shadow: 0 0 20px var(--phosphor-glow);
         cursor: pointer;
+        text-transform: uppercase;
     }
 
     .screen-on {
@@ -594,38 +620,12 @@ body {
     padding-left: 10px;
 }
 
-#mobile-power-btn {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    #mobile-power-btn {
-        display: block;
-    }
-}
-
-#power-led {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    background-color: #4a0000;
-    box-shadow: 0 0 2px #4a0000;
-    animation: blink-standby 3s infinite ease-in-out;
-}
-
-#power-led.on {
-    background-color: #0f0;
-    box-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
-    animation: none;
-}
-
 @keyframes blink-standby {
 
     0%,
     100% {
-        background-color: #000;
-        box-shadow: 0 0 2px #000;
+        background-color: #330000;
+        box-shadow: 0 0 2px #330000;
     }
 
     50% {
