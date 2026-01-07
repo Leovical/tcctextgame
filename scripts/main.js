@@ -17,7 +17,9 @@ const GameAPI = {
             });
 
             const newGuestId = response.headers.get("X-Guest-ID");
-            if (newGuestId) localStorage.setItem("guest_id", newGuestId);
+            if (newGuestId && newGuestId !== "null" && newGuestId !== "undefined") {
+                localStorage.setItem("guest_id", newGuestId);
+            }
 
             const data = await response.json();
             return { ok: response.ok, data };
@@ -347,9 +349,20 @@ class GameInterface {
             }
 
             if (i < content.length) {
-                visibleEl.textContent = content.slice(0, i + 1);
+                if (content[i] === '<') {
+                    let tagEnd = content.indexOf('>', i);
+                    if (tagEnd !== -1) {
+                        i = tagEnd + 1;
+                    } else {
+                        i++;
+                    }
+                } else {
+                    i++;
+                }
+
+                visibleEl.innerHTML = content.slice(0, i).replace(/\n/g, '<br>');
+
                 if (this.autoScrollEnabled) this.scrollToBottom();
-                i++;
                 setTimeout(tick, this.TYPE_SPEED);
             } else {
                 finish();
