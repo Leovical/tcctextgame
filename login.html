@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Casos de Código</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="images/detective-face.svg">
+    <link rel="stylesheet" href="styles/login.css" />
+    <script src="scripts/login.js"></script>
+</head>
+
+<body>
+    <audio id="bg-music" src="audio/music-loop.mp3" autoplay loop></audio>
+
+    <main class="menu">
+        <header class="menu-header">
+            <h2 class="subtitle">AGÊNCIA DE INVESTIGAÇÃO ESPECIAL</h2>
+            <h1 class="title">CASOS DE CÓDIGO</h1>
+        </header>
+
+        <img src="images/detective.png" alt="Detetive sombrio" class="detective" />
+
+        <div class="login-container">
+            <div class="login-wrapper">
+                
+                <form class="login-form">
+                    
+                    <fieldset class="input-box top-box">
+                        <legend>USUÁRIO</legend>
+                        <div class="input-content">
+                            <img src="images/icon-user.png" alt="Usuário" class="input-icon">
+                            <div class="separator"></div> <input type="text" autocomplete="off" required>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="input-box bottom-box">
+                        <legend>SENHA</legend>
+                        
+                        <div class="input-content password-row">
+                            <img src="images/icon-lock.png" alt="Cadeado" class="input-icon">
+                            <div class="separator"></div>
+                            <input type="password" id= "password-input" placeholder="" required>
+                            <img src="images/eye-slash.png" alt="Mostrar senha" class="input-icon eye-toggle" id="toggle-password">
+                        </div>
+
+                        <button type="submit" class="btn-entrar">ENTRAR</button>
+                    </fieldset>
+
+                </form>
+
+            </div>
+
+            <div class="login-footer">
+                <a href="#" class="btn-esquecerSenha">Esqueceu sua senha?</a>
+                <a href="#" class="btn-credenciar">Credenciar-se.</a>
+            </div>
+
+        </div> 
+    </main>
+</body>
+
+</html>
