@@ -263,5 +263,8 @@ fieldset.bottom-box{
         font-size: 2.6rem;
     }
 
+    .login-wrapper, .login-footer {
+        width: 90%;
+    }
 
 }
