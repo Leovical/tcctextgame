@@ -1,0 +1,240 @@
+@font-face {
+    font-family: 'The Led Display';
+    src: url('../fonts/TheLedDisplay.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Pixellari';
+    src: url('../fonts/Pixellari.ttf') format('truetype');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+h1,
+h2 {
+    font-weight: normal;
+    font-family: "The Led Display", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: #33FF33;
+    text-shadow: 0 0 2px #33FF33, 0 0 5px #33FF33;
+}
+
+body {
+    font-family: "The Led Display", monospace;
+    background-color: #020f02;
+    color: #33FF33;
+    overflow: hidden;
+}
+
+.menu {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 40px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.menu::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url("../textures/noise.png") repeat;
+    mix-blend-mode: screen;
+    opacity: 0.40;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.menu::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1px);
+    background-size: 100% 3px;
+    mix-blend-mode: multiply;
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+.menu-header {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+}
+
+.title {
+    font-size: 4.8rem;
+    margin-top: 10px;
+}
+
+.detective {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 78%;
+    width: auto;
+    opacity: 0.92;
+    z-index: 1;
+    image-rendering: crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
+}
+
+.register-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    width: 100%;
+    margin-bottom: 40px;
+    flex-grow: 1;
+}
+
+.register-wrapper{
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* fieldsets */
+fieldset.input-box{
+    border: 1px solid #33FF33;
+    background: rgba(51, 255, 51, 0.1);
+    margin: 0;
+    padding: 0 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+fieldset.input-box legend{
+    color:#33FF33;
+    padding: 0 10px;
+    font-family: "The Led Display", monospace;
+    font-size: 1.2rem; 
+    letter-spacing: 2px;
+    margin-left: 10px;
+}
+
+fieldset.top-box{
+    border-bottom: none; 
+    padding-bottom: 30px; 
+    padding-top: 5px;
+}
+
+fieldset.middle-box{
+    border-bottom: none; 
+    margin-top: -15px;   
+    padding-top: 10px;
+    padding-bottom: 30px; 
+}
+
+fieldset.bottom-box{
+    margin-top: -15px; 
+    padding-top: 10px;
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+}
+
+/* inputs */
+.input-content{
+    display: flex;
+    align-items: center;
+    height: 45px; 
+    border: 1px solid rgba(51, 255, 51);
+    background: #000;
+    padding: 0 10px;
+    border-radius: 3px;
+}
+
+.separator{
+    width: 1px; height: 100%; background-color: #33FF33; margin: 0 15px;
+}
+
+.input-content input{
+    background: transparent; border: none; outline: none;
+    color: #33FF33; font-family: "Pixellari", sans-serif;
+    font-size: 1.3rem; letter-spacing: 2px; width: 100%; flex-grow: 1;
+}
+
+.input-icon{
+    width: 24px; height: auto; display: block; margin-left: 5px;
+}
+
+.eye-toggle {
+    cursor: pointer; transition: transform 0.2s ease; opacity: 0.8;
+}
+.eye-toggle:hover { transform: scale(1.1); opacity: 1; }
+
+/* btn-credenciar */
+.btn-credenciar{
+    margin: 0 auto;
+    margin-top: 5px;
+    background: transparent;
+    border: 1px solid #33FF33;
+    color: #33FF33;
+    font-family: "The Led Display", monospace;
+    font-size: 1.5rem;
+    padding: 8px 0;
+    width: 300px; 
+    cursor: pointer;
+    box-shadow: inset 0 0 10px rgba(51, 255, 51, 0.1);
+    transition: all 0.3s ease;
+    border-radius: 5px;
+}
+
+.btn-credenciar:hover{
+    color: #33FF33; box-shadow: 0 0 10px #33FF33;
+}
+
+/* footer */
+.login-footer{
+    width: 100%; max-width: 480px;
+    display: flex; justify-content: center; /* Centralizado */
+    margin-top: 15px;
+    font-family: "Pixellari", sans-serif; font-size: 1rem;
+}
+
+.login-footer a{ color: #33FF33; text-decoration: none; opacity: 0.8; }
+
+.login-footer a:hover{ text-decoration: underline; opacity: 1; }
+
+
+@media (max-width: 768px) {
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .title {
+        font-size: 2.6rem;
+    }
+
+    .register-wrapper, .register-footer {
+        width: 90%;
+    }
+
+}

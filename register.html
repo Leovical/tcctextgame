@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Casos de Código - Registro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="images/detective-face.svg">
+    <link rel="stylesheet" href="styles/register.css" />
+    <script src="scripts/register.js"></script>
+</head>
+
+<body>
+    <audio id="bg-music" src="audio/music-loop.mp3" autoplay loop></audio>
+
+    <main class="menu">
+        <header class="menu-header">
+            <h2 class="subtitle">AGÊNCIA DE INVESTIGAÇÃO ESPECIAL</h2>
+            <h1 class="title">CASOS DE CÓDIGO</h1>
+        </header>
+
+        <img src="images/detective.png" alt="Detetive sombrio" class="detective" />
+
+        <div class="register-container">
+            <div class="register-wrapper">
+                
+                <form class="register-form">
+                    
+                    <fieldset class="input-box top-box">
+                        <legend>USUÁRIO</legend>
+                        <div class="input-content">
+                            <img src="images/icon-user.png" alt="Usuário" class="input-icon">
+                            <div class="separator"></div> 
+                            <input type="text" autocomplete="off" required>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="input-box middle-box">
+                        <legend>E-MAIL</legend>
+                        <div class="input-content">
+                            <img src="images/icon-email.png" alt="Email" class="input-icon">
+                            <div class="separator"></div> 
+                            <input type="email" autocomplete="off" required>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="input-box middle-box">
+                        <legend>SENHA</legend>
+                        <div class="input-content password-row">
+                            <img src="images/icon-lock.png" alt="Cadeado" class="input-icon">
+                            <div class="separator"></div>
+                            <input type="password" id="pass-1" required>
+                            <img src="images/eye-slash.png" class="input-icon eye-toggle" id="toggle-1">
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="input-box bottom-box">
+                        <legend>REPETIR SENHA</legend>
+                        
+                        <div class="input-content password-row">
+                            <img src="images/icon-lock.png" alt="Cadeado" class="input-icon">
+                            <div class="separator"></div>
+                            <input type="password" id="pass-2" required>
+                            <img src="images/eye-slash.png" class="input-icon eye-toggle" id="toggle-2">
+                        </div>
+
+                        <button type="submit" class="btn-credenciar">CREDENCIAR</button>
+                    </fieldset>
+
+                </form>
+
+            </div>
+
+            <div class="login-footer">
+                <a href="login.html" class="btn-voltar">Já possui credencial? Entrar.</a>
+            </div>
+
+        </div> 
+    </main>
+</body>
+</html>
