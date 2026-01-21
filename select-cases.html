@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Casos de Código - Seleção</title>
+    <link rel="icon" href="images/detective-face.svg">
+    <link rel="stylesheet" href="./styles/select-cases.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="computer-container">
+            <div class="monitor">
+                <div class="monitor-inner">
+                    <div class="screen-container">
+
+                        <div class="screen screen-off" id="game-screen-area">
+                            <div class="glow-overlay"></div>
+                            
+                            <div class="selection-interface">
+                                
+                                <div id="case-title">ARQUIVOS DE CASOS</div>
+                                
+                                <div class="case-list-scroll" id="case-list">
+                                    <p style="text-align: center; margin-top: 20px;">CARREGANDO DADOS...</p>
+                                </div>
+
+                                <div class="footer-controls">
+                                    <button id="btn-voltar" onclick="window.history.back()">VOLTAR</button>
+                                </div>
+
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <div class="monitor-bottom">
+                    <div class="power-switch" id="power-btn-container">
+                        <div class="button"></div>
+                    </div>
+                    <div class="power-led" id="power-led"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button id="mobile-power-btn">LIGAR TERMINAL</button>
+    <audio id="music-loop" src="./audio/music-loop.mp3" loop volume="0.3"></audio>
+
+    <script src="scripts/select-cases.js"></script>
+</body>
+</html>
