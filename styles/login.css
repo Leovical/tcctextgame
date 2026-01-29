@@ -253,6 +253,31 @@ fieldset.bottom-box{
     text-decoration: underline;
 }
 
+.visitante{
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    font-family: "Pixellari", sans-serif;
+    font-size: 1rem;
+    z-index: 20;
+}
+
+.visitante a{
+    color: #B1FF33;
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+.visitante:hover{
+    text-decoration: underline;
+}
+
 
 @media (max-width: 768px) {
     .subtitle {
