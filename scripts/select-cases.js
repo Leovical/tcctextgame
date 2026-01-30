@@ -1,19 +1,37 @@
-const API_URL = "https://casosdecodigo-5l0x.onrender.com/api";
+const API_BASE_URL = "http://localhost:8080/api";
 
 const SelectionAPI = {
-    
-    // simulando requisição
     async getCases() {
-        // por enquanto, retornando dados locais (depois fazer fecth igual do main.js)
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve([
-                    { id: 1, title: "O INÍCIO", status: "completed", difficulty: 1, label: "CONCLUÍDO" },
-                    { id: 2, title: "BACANA MESMO", status: "available", difficulty: 2, label: "DISPONÍVEL" },
-                    { id: 3, title: "ACESSO NEGADO", status: "blocked", difficulty: 5, label: "BLOQUEADO" }
-                ]);
-            }, 500); 
-        });
+        const token = localStorage.getItem('auth_token');
+        const guestId = localStorage.getItem('guest_id');
+
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        } else if (guestId) {
+            headers['X-Guest-ID'] = guestId;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/cases`, {
+                method: 'GET',
+                headers: headers
+            });
+
+            if (response.status === 401) {
+                alert("Sessão expirada. Faça login novamente.");
+                window.location.href = 'login.html';
+                return null;
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Erro ao buscar casos:", error);
+            return null;
+        }
     }
 };
 
@@ -25,8 +43,9 @@ class SelectionInterface {
         this.mobilePowerBtn = document.getElementById('mobile-power-btn');
         this.screenArea = document.getElementById('game-screen-area');
         this.audioLoop = document.getElementById('music-loop');
-        this.sfxPower = document.getElementById('sfx-power') || new Audio('audio/startup_button.mp3');
+        this.sfxPower = new Audio('audio/startup_button.mp3'); 
         this.caseListContainer = document.getElementById('case-list');
+        
         this.isPoweredOn = false;
         this.bindEvents();
     }
@@ -40,7 +59,8 @@ class SelectionInterface {
         this.isPoweredOn ? this.turnOff() : this.turnOn();
     }
 
-    async turnOn() {
+    turnOn() {
+        if (this.isPoweredOn) return;
         this.isPoweredOn = true;
         
         this.powerBtnButton?.classList.add('clicked');
@@ -48,23 +68,24 @@ class SelectionInterface {
         
         this.powerLed?.classList.add('on');
         this.sfxPower.currentTime = 0;
-        this.sfxPower.play().catch(() => {});
+        this.sfxPower.play().catch(e => console.log("Erro audio:", e));
 
         if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = 'none';
         
         this.screenArea.classList.replace('screen-off', 'screen-on');
 
-        setTimeout(async () => {
+        setTimeout(() => {
             if (this.isPoweredOn) {
-                this.audioLoop.volume = 0.3;
+                this.audioLoop.volume = 0.2;
                 this.audioLoop.play().catch(() => {});
 
                 this.loadAndRenderCases();
             }
-        }, 1200);
+        }, 1500); 
     }
 
     turnOff() {
+        if (!this.isPoweredOn) return;
         this.isPoweredOn = false;
         
         this.powerBtnButton?.classList.add('clicked');
@@ -77,56 +98,88 @@ class SelectionInterface {
         this.screenArea.classList.replace('screen-on', 'screen-off');
         this.audioLoop.pause();
         this.audioLoop.currentTime = 0;
+        
+        if (this.caseListContainer) {
+            this.caseListContainer.innerHTML = '<p style="text-align: center; margin-top: 20px;">INICIALIZANDO SISTEMA...</p>';
+        }
     }
 
-    // renderizando os casos
     async loadAndRenderCases() {
         if (!this.caseListContainer) return;
 
-        this.caseListContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">ACESSANDO BANCO DE DADOS...</p>';
+        this.caseListContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">CONECTANDO AO SERVIDOR...</p>';
 
-        // mock ou api
-        const cases = await SelectionAPI.getCases();
+        const data = await SelectionAPI.getCases();
+
+        if (!data || !data.cases) {
+            this.caseListContainer.innerHTML = '<p style="text-align:center; color: red;">ERRO DE CONEXÃO.</p>';
+            return;
+        }
 
         this.caseListContainer.innerHTML = '';
+      
+        const progressionsMap = {};
+        if (data.progressions) {
+            data.progressions.forEach(p => {
+                progressionsMap[p.case_id] = p; 
+            });
+        }
 
-        cases.forEach(caso => {
-            const cardHTML = this.createCaseCard(caso);
+        let previousCompleted = true; 
+
+        data.cases.forEach((caso, index) => {
+            const progression = progressionsMap[caso.id];
+            let status = 'blocked';
+            let label = 'BLOQUEADO';
+
+            if (progression && progression.completed) {
+                status = 'completed';
+                label = 'CONCLUÍDO';
+            } else if (previousCompleted) {
+                status = 'available';
+                label = 'DISPONÍVEL';
+                if (progression) label = 'EM ANDAMENTO'; 
+            }
+
+            previousCompleted = (status === 'completed');
+
+            const cardHTML = this.createCaseCard(caso, status, label);
             this.caseListContainer.innerHTML += cardHTML;
         });
     }
 
-    createCaseCard(caso) {
+    createCaseCard(caso, status, label) {
         let iconPath = '';
         let cssClass = '';
 
-        switch(caso.status) {
+        switch(status) {
             case 'completed':
                 iconPath = 'images/icon-check.png';
-                cssClass = 'completed';
+                cssClass = 'completed'; 
                 break;
             case 'available':
                 iconPath = 'images/icon-folder.png';
-                cssClass = 'available';
+                cssClass = ''; 
                 break;
             case 'blocked':
             default:
                 iconPath = 'images/icon-lock.png';
-                cssClass = 'blocked';
+                cssClass = 'blocked'; 
                 break;
         }
 
-        const stars = '★'.repeat(caso.difficulty) + '☆'.repeat(5 - caso.difficulty);
+        let diffNum = parseInt(caso.difficulty) || 1; 
+        const stars = '★'.repeat(diffNum) + '☆'.repeat(5 - diffNum);
 
         return `
-            <div class="case-card ${cssClass}" onclick="window.gameInterface.selectCase(${caso.id}, '${caso.status}')">
+            <div class="case-card ${cssClass}" onclick="window.gameInterface.selectCase('${caso.id}', '${status}')">
                 <div class="card-icon">
-                    <img src="${iconPath}" alt="${caso.status}">
+                    <img src="${iconPath}" alt="${status}">
                 </div>
                 <div class="card-content">
-                    <h2>CASO ${String(caso.id).padStart(2, '0')}: ${caso.title}</h2>
+                    <h2>ARQUIVO ${caso.id.substring(0,4)}... : ${caso.title}</h2>
                     <div class="card-meta">
-                        <span>${caso.label}</span>
+                        <span>${label}</span>
                         <span>DIF: ${stars}</span>
                     </div>
                 </div>
@@ -134,13 +187,15 @@ class SelectionInterface {
         `;
     }
 
-
     selectCase(id, status) {
         if (status === 'blocked') {
-            alert("ACESSO NEGADO: Complete os casos anteriores.");
+            alert("ACESSO NEGADO: Arquivos criptografados. Complete os casos anteriores.");
             return;
         }
+        
         console.log(`Carregando caso ${id}...`);
+        
+        window.location.href = `game.html?id=${id}`;
     }
 }
 
