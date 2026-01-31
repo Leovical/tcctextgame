@@ -79,4 +79,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    //botão visitante
+    const guestLink = document.querySelector('.visitante a');
+
+    if (guestLink) {
+        guestLink.addEventListener('click', (event) => {
+            event.preventDefault(); 
+
+            const randomID = 'guest_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+
+            localStorage.setItem('guest_id', randomID);
+            
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_data');
+
+            window.location.href = "index.html";
+        });
+    }
 });
