@@ -1,20 +1,20 @@
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "https://casosdecodigo-5l0x.onrender.com/api";
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // ocultar/mostrar senha
     const passwordInput = document.getElementById('password-input');
     const toggleIcon = document.getElementById('toggle-password');
 
     if (passwordInput && toggleIcon) {
-        toggleIcon.addEventListener('click', function() {
+        toggleIcon.addEventListener('click', function () {
             const currentType = passwordInput.getAttribute('type');
             const newType = currentType === 'password' ? 'text' : 'password';
-            
+
             passwordInput.setAttribute('type', newType);
 
             if (newType === 'text') {
-                this.src = 'images/eye-open.png'; 
+                this.src = 'images/eye-open.png';
             } else {
                 this.src = 'images/eye-slash.png';
             }
@@ -23,11 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // conexão com api
     const loginForm = document.getElementById('login-form');
-    const usernameInput = document.getElementById('username-input'); 
+    const usernameInput = document.getElementById('username-input');
 
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); 
+            event.preventDefault();
 
             const username = usernameInput.value;
             const password = passwordInput.value;
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log("Login realizado:", data);
 
                     localStorage.setItem('auth_token', data.token);
-                    
+
                     localStorage.setItem('user_data', JSON.stringify(data.user));
 
                     localStorage.removeItem('guest_id');
@@ -85,12 +85,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (guestLink) {
         guestLink.addEventListener('click', (event) => {
-            event.preventDefault(); 
+            event.preventDefault();
 
             const randomID = 'guest_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
 
             localStorage.setItem('guest_id', randomID);
-            
+
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_data');
 
