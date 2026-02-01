@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     localStorage.removeItem('guest_id');
 
-                    window.location.href = "index.html";
+                    window.location.replace("index.html");
                 } else {
                     alert(`Erro: ${data.error || "Falha no login"}`);
                 }
