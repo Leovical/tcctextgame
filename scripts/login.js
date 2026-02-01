@@ -2,7 +2,6 @@ const API_BASE_URL = "https://casosdecodigo-5l0x.onrender.com/api";
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ocultar/mostrar senha
     const passwordInput = document.getElementById('password-input');
     const toggleIcon = document.getElementById('toggle-password');
 
@@ -21,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // conexão com api
     const loginForm = document.getElementById('login-form');
     const usernameInput = document.getElementById('username-input');
 
@@ -57,22 +55,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    console.log("Login realizado:", data);
-
                     localStorage.setItem('auth_token', data.token);
-
                     localStorage.setItem('user_data', JSON.stringify(data.user));
-
                     localStorage.removeItem('guest_id');
-
                     window.location.replace("index.html");
                 } else {
-                    alert(`Erro: ${data.error || "Falha no login"}`);
+                    alert(`Erro: ${data.error || "Falha no acesso"}`);
                 }
 
             } catch (error) {
-                console.error("Erro na requisição:", error);
-                alert("Erro de conexão com o servidor. O API está rodando?");
+                alert("Erro de conexão com o servidor remoto.");
             } finally {
                 submitBtn.innerText = originalBtnText;
                 submitBtn.disabled = false;
@@ -80,8 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    //botão visitante
-    const guestLink = document.querySelector('.visitante a');
+    const guestLink = document.querySelector('.btn-visitante');
 
     if (guestLink) {
         guestLink.addEventListener('click', (event) => {
@@ -90,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const randomID = 'guest_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
 
             localStorage.setItem('guest_id', randomID);
-
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_data');
 

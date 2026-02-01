@@ -101,26 +101,24 @@ body {
     image-rendering: pixelated;
 }
 
-.login-container{
+.login-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 10;
-    width: 100%;
-    margin-bottom: 40px;
+    width: 90svw;
+    max-width: 480px;
     flex-grow: 1;
 }
 
-.login-wrapper{
+.login-wrapper {
     width: 100%;
-    max-width: 480px;
     display: flex;
     flex-direction: column;
 }
 
-/* fieldsets */
-fieldset.input-box{
+fieldset.input-box {
     border: 1px solid #33FF33;
     background: rgba(51, 255, 51, 0.1);
     margin: 0;
@@ -129,9 +127,8 @@ fieldset.input-box{
     box-sizing: border-box;
 }
 
-/* titulos do input-box */
-fieldset.input-box legend{
-    color:#33FF33;
+fieldset.input-box legend {
+    color: #33FF33;
     padding: 0 10px;
     font-family: "The Led Display", monospace;
     font-size: 1.5rem;
@@ -139,14 +136,13 @@ fieldset.input-box legend{
     margin-left: 10px;
 }
 
-/* ajustando caixas */
-fieldset.top-box{
+fieldset.top-box {
     border-bottom: none;
     padding-bottom: 60px;
     padding-top: 10px;
 }
 
-fieldset.bottom-box{
+fieldset.bottom-box {
     margin-top: -19px;
     padding-top: 15px;
     padding-bottom: 25px;
@@ -155,25 +151,24 @@ fieldset.bottom-box{
     gap: 20px;
 }
 
-/* conteúdo inputs */
-.input-content{
+.input-content {
     display: flex;
     align-items: center;
     height: 50px;
-    border: 1px solid rgba(51, 255, 51);;
+    border: 1px solid rgba(51, 255, 51);
     background: #000;
     padding: 0 10px;
     border-radius: 3px;
 }
 
-.separator{
+.separator {
     width: 1px;
     height: 100%;
     background-color: #33FF33;
     margin: 0 20px;
 }
 
-.input-content input{
+.input-content input {
     background: transparent;
     border: none;
     outline: none;
@@ -185,28 +180,26 @@ fieldset.bottom-box{
     flex-grow: 1;
 }
 
-/* mexer nos ícones */
-.input-icon{
+.input-icon {
     width: 30px;
-    height: auto; 
+    height: auto;
     display: block;
     margin-left: 10px;
 }
 
 .eye-toggle {
-    cursor: pointer; 
-    transition: transform 0.2s ease, filter 0.2s ease; 
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
     opacity: 0.8;
 }
 
 .eye-toggle:hover {
-    transform: scale(1.1); 
+    transform: scale(1.1);
     opacity: 1;
-    filter: drop-shadow(0 0 5px #33FF33); 
+    filter: drop-shadow(0 0 5px #33FF33);
 }
 
-/* botão entrar */
-.btn-entrar{
+.btn-entrar {
     margin: 0 auto;
     margin-top: 10px;
     background: transparent;
@@ -222,13 +215,12 @@ fieldset.bottom-box{
     border-radius: 5px;
 }
 
-.btn-entrar:hover{
+.btn-entrar:hover {
     color: #33FF33;
     box-shadow: 0 0 10px #33FF33;
 }
 
-/* --- login footer --- */
-.login-footer{
+.login-footer {
     width: 100%;
     max-width: 480px;
     display: flex;
@@ -239,45 +231,20 @@ fieldset.bottom-box{
     font-size: 1rem;
 }
 
-.login-footer a{
+.login-footer a {
     color: #33FF33;
     text-decoration: none;
     opacity: 0.8;
 }
 
-.btn-credenciar:hover{
+.btn-visitante {
+    color: #B1FF33 !important;
+}
+
+.login-footer a:hover {
     text-decoration: underline;
+    opacity: 1;
 }
-
-.btn-esquecerSenha:hover{
-    text-decoration: underline;
-}
-
-.visitante{
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 480px;
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    font-family: "Pixellari", sans-serif;
-    font-size: 1rem;
-    z-index: 20;
-}
-
-.visitante a{
-    color: #B1FF33;
-    text-decoration: none;
-    opacity: 0.8;
-}
-
-.visitante:hover{
-    text-decoration: underline;
-}
-
 
 @media (max-width: 768px) {
     .subtitle {
@@ -285,11 +252,15 @@ fieldset.bottom-box{
     }
 
     .title {
-        font-size: 2.6rem;
+        font-size: 2rem;
     }
 
-    .login-wrapper, .login-footer {
+    .login-wrapper,
+    .login-footer {
         width: 90%;
     }
 
+    .menu {
+        padding: 10px 20px;
+    }
 }

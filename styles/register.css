@@ -41,7 +41,7 @@ body {
     position: relative;
     width: 100%;
     height: 100%;
-    padding: 40px 60px;
+    padding: 10px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -101,18 +101,17 @@ body {
     image-rendering: pixelated;
 }
 
-.register-container{
+.register-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 10;
-    width: 100%;
-    margin-bottom: 40px;
+    width: 90svw;
     flex-grow: 1;
 }
 
-.register-wrapper{
+.register-wrapper {
     width: 100%;
     max-width: 480px;
     display: flex;
@@ -120,7 +119,7 @@ body {
 }
 
 /* fieldsets */
-fieldset.input-box{
+fieldset.input-box {
     border: 1px solid #33FF33;
     background: rgba(51, 255, 51, 0.1);
     margin: 0;
@@ -129,99 +128,126 @@ fieldset.input-box{
     box-sizing: border-box;
 }
 
-fieldset.input-box legend{
-    color:#33FF33;
+fieldset.input-box legend {
+    color: #33FF33;
     padding: 0 10px;
     font-family: "The Led Display", monospace;
-    font-size: 1.2rem; 
+    font-size: 1.2rem;
     letter-spacing: 2px;
     margin-left: 10px;
 }
 
-fieldset.top-box{
-    border-bottom: none; 
-    padding-bottom: 30px; 
+fieldset.top-box {
+    border-bottom: none;
+    padding-bottom: 30px;
     padding-top: 5px;
 }
 
-fieldset.middle-box{
-    border-bottom: none; 
-    margin-top: -15px;   
+fieldset.middle-box {
+    border-bottom: none;
+    margin-top: -15px;
     padding-top: 10px;
-    padding-bottom: 30px; 
+    padding-bottom: 30px;
 }
 
-fieldset.bottom-box{
-    margin-top: -15px; 
+fieldset.bottom-box {
+    margin-top: -15px;
     padding-top: 10px;
     padding-bottom: 20px;
     display: flex;
     flex-direction: column;
-    gap: 15px; 
+    gap: 15px;
 }
 
 /* inputs */
-.input-content{
+.input-content {
     display: flex;
     align-items: center;
-    height: 45px; 
+    height: 45px;
     border: 1px solid rgba(51, 255, 51);
     background: #000;
     padding: 0 10px;
     border-radius: 3px;
 }
 
-.separator{
-    width: 1px; height: 100%; background-color: #33FF33; margin: 0 15px;
+.separator {
+    width: 1px;
+    height: 100%;
+    background-color: #33FF33;
+    margin: 0 15px;
 }
 
-.input-content input{
-    background: transparent; border: none; outline: none;
-    color: #33FF33; font-family: "Pixellari", sans-serif;
-    font-size: 1.3rem; letter-spacing: 2px; width: 100%; flex-grow: 1;
+.input-content input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #33FF33;
+    font-family: "Pixellari", sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    width: 100%;
+    flex-grow: 1;
 }
 
-.input-icon{
-    width: 24px; height: auto; display: block; margin-left: 5px;
+.input-icon {
+    width: 24px;
+    height: auto;
+    display: block;
+    margin-left: 5px;
 }
 
 .eye-toggle {
-    cursor: pointer; transition: transform 0.2s ease; opacity: 0.8;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    opacity: 0.8;
 }
-.eye-toggle:hover { transform: scale(1.1); opacity: 1; }
+
+.eye-toggle:hover {
+    transform: scale(1.1);
+    opacity: 1;
+}
 
 /* btn-credenciar */
-.btn-credenciar{
-    margin: 0 auto;
-    margin-top: 5px;
+.btn-credenciar {
     background: transparent;
     border: 1px solid #33FF33;
     color: #33FF33;
     font-family: "The Led Display", monospace;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     padding: 8px 0;
-    width: 300px; 
     cursor: pointer;
     box-shadow: inset 0 0 10px rgba(51, 255, 51, 0.1);
     transition: all 0.3s ease;
     border-radius: 5px;
 }
 
-.btn-credenciar:hover{
-    color: #33FF33; box-shadow: 0 0 10px #33FF33;
+.btn-credenciar:hover {
+    color: #33FF33;
+    box-shadow: 0 0 10px #33FF33;
 }
 
 /* footer */
-.login-footer{
-    width: 100%; max-width: 480px;
-    display: flex; justify-content: center; /* Centralizado */
+.login-footer {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: center;
+    /* Centralizado */
     margin-top: 15px;
-    font-family: "Pixellari", sans-serif; font-size: 1rem;
+    font-family: "Pixellari", sans-serif;
+    font-size: 1rem;
 }
 
-.login-footer a{ color: #33FF33; text-decoration: none; opacity: 0.8; }
+.login-footer a {
+    color: #33FF33;
+    text-decoration: none;
+    opacity: 0.8;
+}
 
-.login-footer a:hover{ text-decoration: underline; opacity: 1; }
+.login-footer a:hover {
+    text-decoration: underline;
+    opacity: 1;
+}
 
 
 @media (max-width: 768px) {
@@ -230,10 +256,11 @@ fieldset.bottom-box{
     }
 
     .title {
-        font-size: 2.6rem;
+        font-size: 2rem;
     }
 
-    .register-wrapper, .register-footer {
+    .register-wrapper,
+    .register-footer {
         width: 90%;
     }
 
