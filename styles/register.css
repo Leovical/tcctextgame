@@ -213,12 +213,15 @@ fieldset.bottom-box {
     border: 1px solid #33FF33;
     color: #33FF33;
     font-family: "The Led Display", monospace;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     padding: 8px 0;
     cursor: pointer;
     box-shadow: inset 0 0 10px rgba(51, 255, 51, 0.1);
     transition: all 0.3s ease;
     border-radius: 5px;
+    width: 250px;
+    margin: 0 auto;
+    margin-top: 5px;
 }
 
 .btn-credenciar:hover {
