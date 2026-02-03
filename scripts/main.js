@@ -270,12 +270,23 @@ class GameInterface {
 
         if (res.ok) {
             const baseNarrative = GameAPI.getPuzzleBaseNarrative(res.data);
-            let narrativeToShow = res.data.narrative || res.data.response || res.data.success_narrative || res.data.failure_narrative;
+            let narrativeToShow = res.data.narrative || res.data.state?.narrative;
+
+            const stateTables = res.data.state?.tables;
+
+            if (stateTables && stateTables.length > 0 && narrativeToShow.includes("Tabelas disponíveis")) {
+                const tableListString = `\n> [ ${stateTables.join(', ')} ]`;
+
+                narrativeToShow = narrativeToShow.replace(
+                    "consulte as tabelas listadas acima.",
+                    tableListString
+                );
+            }
 
             const imageKey = res.data.image_key || res.data.success_image_key || res.data.failure_image_key;
 
             if (res.data.data && narrativeToShow === baseNarrative) {
-                narrativeToShow = "Você executa a consulta. As linhas começam a surgir no monitor, frias e impessoais.";
+                narrativeToShow = "Você executa a consulta. As linhas surgem no monitor.";
             }
 
             if (narrativeToShow) {
