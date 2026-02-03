@@ -227,9 +227,12 @@ class GameInterface {
         }
 
         if (narrative) {
+            const puzzleNum = GameAPI.state?.current_puzzle || 1;
+            const puzzleData = window.gameCaseData?.puzzles?.find(p => p.number === puzzleNum);
+            const imgKey = puzzleData?.image_key;
 
             setTimeout(() => {
-                this.queueMessage(narrative, 'narrative');
+                this.queueMessage(narrative, 'narrative', imgKey);
             }, 100);
         } else {
             setTimeout(() => {
@@ -267,13 +270,18 @@ class GameInterface {
 
         if (res.ok) {
             const baseNarrative = GameAPI.getPuzzleBaseNarrative(res.data);
-            let narrativeToShow = res.data.narrative || res.data.state?.narrative;
+            let narrativeToShow = res.data.narrative || res.data.response || res.data.success_narrative || res.data.failure_narrative;
+
+            const imageKey = res.data.image_key || res.data.success_image_key || res.data.failure_image_key;
 
             if (res.data.data && narrativeToShow === baseNarrative) {
-                narrativeToShow = "Você executa a consulta. As linhas começam a surgir no monitor, frias e impessoais como qualquer outro log do DITEC.";
+                narrativeToShow = "Você executa a consulta. As linhas começam a surgir no monitor, frias e impessoais.";
             }
 
-            if (narrativeToShow) this.queueMessage(`\n➤ ${narrativeToShow}`, 'narrative');
+            if (narrativeToShow) {
+                this.queueMessage(`\n➤ ${narrativeToShow}`, 'narrative', imageKey);
+            }
+
             if (res.data.data) this.queueMessage(GameAPI.formatTableData(res.data.data), 'data');
             GameAPI.state = res.data;
         } else {
@@ -281,11 +289,23 @@ class GameInterface {
         }
     }
 
-    queueMessage(content, type) {
-        this.messageQueue.push({ content, type });
-        requestAnimationFrame(() => {
-            this.processQueue();
-        });
+    queueMessage(content, type, imageKey = null) {
+        let processedContent = content;
+
+        if (imageKey) {
+            const assetsBaseUrl = API_URL.replace('/api', '');
+            const imgHtml = `
+            <div class="evidence-container">
+                <img src="${assetsBaseUrl}/assets/${imageKey}" class="evidence-img">
+            </div>`;
+
+            processedContent = content.includes('[[IMAGE]]')
+                ? content.replace('[[IMAGE]]', imgHtml)
+                : content + `<br>${imgHtml}`;
+        }
+
+        this.messageQueue.push({ content: processedContent, type });
+        requestAnimationFrame(() => this.processQueue());
     }
 
     processQueue() {

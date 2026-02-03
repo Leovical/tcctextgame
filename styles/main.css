@@ -619,3 +619,54 @@ body {
         z-index: 300 !important;
     }
 }
+
+/* Container para a evidência com efeito de terminal */
+.evidence-container {
+    position: relative;
+    display: inline-block;
+    margin: 15px 0;
+    border: 1px solid var(--primary-color);
+    line-height: 0;
+    overflow: hidden;
+}
+
+.evidence-img {
+    max-width: 100%;
+    filter: brightness(0.8) contrast(1.2) sepia(0.2);
+    /* Tom levemente envelhecido */
+}
+
+/* Camada de Scanlines */
+.evidence-container::after {
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.1) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Brilho pulsante suave */
+@keyframes crt-glow {
+    0% {
+        opacity: 0.9;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.9;
+    }
+}
+
+.evidence-img {
+    animation: crt-glow 0.15s infinite;
+}
