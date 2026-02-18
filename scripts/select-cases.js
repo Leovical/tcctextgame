@@ -27,7 +27,13 @@ const SelectionAPI = {
                 return null;
             }
 
-            return await response.json();
+            const data = await response.json();
+
+            if (Array.isArray(data)) {
+                return data.sort((a, b) => a.order - b.order);
+            }
+
+            return data;
         } catch (error) {
             console.error("Erro ao buscar casos:", error);
             return null;
