@@ -304,7 +304,11 @@ class GameInterface {
                 );
             }
 
-            const imageKey = res.data.image_key || res.data.success_image_key || res.data.failure_image_key;
+            const imageKey =
+                (res.data.hasOwnProperty("image_key") ? res.data.image_key : null) ??
+                res.data.success_image_key ??
+                res.data.failure_image_key ??
+                null;
 
             if (res.data.data && narrativeToShow === baseNarrative) {
                 narrativeToShow = "Você executa a consulta. As linhas surgem no monitor.";
