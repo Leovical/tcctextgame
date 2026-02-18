@@ -1,5 +1,6 @@
 const API_URL = "https://casosdecodigo-5l0x.onrender.com/api";
-const CASE_ID = "caso_1";
+const urlParams = new URLSearchParams(window.location.search);
+const CASE_ID = urlParams.get('id') || "caso_0";
 
 const GameAPI = {
     state: null,
