@@ -235,8 +235,7 @@ body {
         background: #000;
         color: var(--phosphor-main);
 
-        border: 2px solid var(--phosphor-main);
-        border-top: none;
+        border: none;
         padding: 10px 25px;
 
         font-family: 'Pixellari', monospace;
