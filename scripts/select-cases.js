@@ -177,7 +177,7 @@ class SelectionInterface {
                     <img src="${iconPath}" alt="${status}">
                 </div>
                 <div class="card-content">
-                    <h2>ARQUIVO ${caso.id.substring(0, 4)}... : ${caso.title}</h2>
+                    <h2>${caso.title}</h2>
                     <div class="card-meta">
                         <span>${label}</span>
                         <span>DIF: ${stars}</span>
