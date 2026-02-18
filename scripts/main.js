@@ -120,9 +120,23 @@ class GameInterface {
     }
 
     async preloadGameData() {
-        await GameAPI.initializeGame().then(res => {
-            if (res.ok) window.gameCaseData = res.data.case;
-        });
+        const res = await GameAPI.initializeGame();
+        if (res.ok) {
+            window.gameCaseData = res.data.case;
+            this.updateHeaderTitle(window.gameCaseData.title);
+        }
+    }
+
+    updateHeaderTitle(fullTitle) {
+        const titleEl = document.getElementById('case-title');
+        if (!titleEl || !fullTitle) return;
+
+        if (fullTitle.includes(' - ')) {
+            const shortTitle = fullTitle.split(' - ')[1];
+            titleEl.innerText = shortTitle.toUpperCase();
+        } else {
+            titleEl.innerText = fullTitle.toUpperCase();
+        }
     }
 
     bindEvents() {
