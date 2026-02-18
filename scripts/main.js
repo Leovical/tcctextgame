@@ -279,6 +279,8 @@ class GameInterface {
             return;
         }
 
+        const oldPuzzle = GameAPI.state?.current_puzzle || GameAPI.state?.state?.current_puzzle || 1;
+
         this.queueMessage(`\n> ${command}`, 'prompt');
         this.scrollToBottom(true);
         const res = await GameAPI.executeSQL(command);
@@ -309,7 +311,16 @@ class GameInterface {
             }
 
             if (res.data.data) this.queueMessage(GameAPI.formatTableData(res.data.data), 'data');
+
             GameAPI.state = res.data;
+
+            const newPuzzle = res.data.current_puzzle || res.data.state?.current_puzzle;
+
+            if (newPuzzle && oldPuzzle && newPuzzle > oldPuzzle) {
+                setTimeout(() => {
+                    this.startNarrative(true);
+                }, 1000);
+            }
         } else {
             this.queueMessage(`\n➤ ERRO: ${res.data.error || 'Erro desconhecido'}`, 'error');
         }
