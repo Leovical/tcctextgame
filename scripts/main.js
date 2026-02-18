@@ -170,10 +170,15 @@ class GameInterface {
             const dist = this.scrollContainer.scrollHeight - this.scrollContainer.scrollTop - this.scrollContainer.clientHeight;
             this.autoScrollEnabled = dist < this.SCROLL_THRESHOLD;
         });
-        const btnVoltar = document.getElementById('btn-voltar');
-        btnVoltar?.addEventListener('click', () => {
+        const btnExit = document.getElementById('btn-exit-case');
+        const btnExitMobile = document.getElementById('btn-voltar-mobile');
+
+        const handleExit = () => {
             window.location.href = 'select-cases.html';
-        });
+        };
+
+        btnExit?.addEventListener('click', handleExit);
+        btnExitMobile?.addEventListener('click', handleExit);
     }
 
     togglePower() {

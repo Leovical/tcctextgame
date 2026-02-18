@@ -219,6 +219,40 @@ body {
     display: none;
 }
 
+.mobile-only-btn {
+    display: none;
+}
+
+@media screen and (max-width: 1080px) {
+    .mobile-only-btn {
+        display: block;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1000;
+        background: rgba(0, 255, 65, 0.1);
+        color: var(--phosphor-main);
+        border: 1px solid var(--phosphor-main);
+        font-family: 'Pixellari', monospace;
+        font-size: 0.75rem;
+        padding: 5px 10px;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+        pointer-events: auto;
+        border-radius: 2px;
+    }
+
+    .mobile-only-btn:active {
+        background: var(--phosphor-main);
+        color: #000;
+    }
+
+    #case-title {
+        padding-top: 15px;
+    }
+}
+
 #power-led {
     width: 1vh;
     height: 1vh;
