@@ -123,6 +123,11 @@ class GameInterface {
         const res = await GameAPI.initializeGame();
         if (res.ok) {
             window.gameCaseData = res.data.case;
+
+            if (res.data.progression) {
+                GameAPI.state = res.data.progression;
+            }
+
             this.updateHeaderTitle(window.gameCaseData.title);
         }
     }
@@ -164,6 +169,10 @@ class GameInterface {
             if (this.isProgrammaticScroll) return;
             const dist = this.scrollContainer.scrollHeight - this.scrollContainer.scrollTop - this.scrollContainer.clientHeight;
             this.autoScrollEnabled = dist < this.SCROLL_THRESHOLD;
+        });
+        const btnVoltar = document.getElementById('btn-voltar');
+        btnVoltar?.addEventListener('click', () => {
+            window.location.href = 'select-cases.html';
         });
     }
 
@@ -212,33 +221,21 @@ class GameInterface {
     async startNarrative(isBaseOnly = false) {
 
         if (!GameAPI.state) {
-            const res = await GameAPI.getGameProgress();
-            if (res.ok) {
-                const progressions = res.data;
-                if (progressions && progressions.length > 0) {
-                    const currentProgression = progressions.find(p => p.case_id === CASE_ID);
-                    if (currentProgression) {
-                        GameAPI.state = {
-                            current_puzzle: currentProgression.current_puzzle,
-                            current_focus: currentProgression.current_focus
-                        };
-                    }
-                }
-            }
+            console.warn("Aguardando sincronização de estado...");
+            return;
         }
 
         let narrative;
-
         if (isBaseOnly) {
             narrative = GameAPI.getPuzzleBaseNarrative(GameAPI.state);
-
-            if (!narrative && window.gameCaseData?.puzzles) {
-                const puzzleNum = GameAPI.state?.current_puzzle || 1;
-                const puzzle = window.gameCaseData.puzzles.find(p => p.number === puzzleNum);
-                narrative = puzzle?.narrative;
-            }
         } else {
             narrative = GameAPI.getCurrentNarrative(GameAPI.state);
+        }
+
+        if (!narrative && window.gameCaseData?.puzzles) {
+            const puzzleNum = GameAPI.state?.current_puzzle || 1;
+            const puzzle = window.gameCaseData.puzzles.find(p => p.number === puzzleNum);
+            narrative = puzzle?.narrative;
         }
 
         if (narrative) {
@@ -248,10 +245,12 @@ class GameInterface {
 
             setTimeout(() => {
                 this.queueMessage(narrative, 'narrative', imgKey);
-            }, 100);
-        } else {
-            setTimeout(() => {
-                this.queueMessage("Sistema inicializado. Digite AJUDA para ver os comandos disponíveis.", 'narrative');
+
+                if (puzzleNum === 6) {
+                    setTimeout(() => {
+                        this.queueMessage("\n\n[ SISTEMA: ARQUIVO FINALIZADO. UTILIZE O BOTÃO 'VOLTAR' PARA RETORNAR AO MENU OU 'RESET' PARA REINICIAR ]", 'system');
+                    }, 1500);
+                }
             }, 100);
         }
     }
