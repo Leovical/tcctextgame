@@ -623,7 +623,8 @@ body {
 /* Container para a evidência com efeito de terminal */
 .evidence-container {
     position: relative;
-    display: inline-block;
+    display: block;
+    text-align: center;
     margin: 15px 0;
     border: 1px solid var(--primary-color);
     line-height: 0;
@@ -632,8 +633,15 @@ body {
 
 .evidence-img {
     max-width: 100%;
+    height: auto;
     filter: brightness(0.8) contrast(1.2) sepia(0.2);
     /* Tom levemente envelhecido */
+}
+
+@media (min-width: 768px) {
+    .evidence-img {
+        max-width: 50%;
+    }
 }
 
 /* Camada de Scanlines */
