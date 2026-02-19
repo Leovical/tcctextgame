@@ -5,6 +5,10 @@ const CASE_ID = urlParams.get('id') || "caso_0";
 const GameAPI = {
     state: null,
 
+    getPuzzleNumber(stateData) {
+        return stateData?.current_puzzle ?? stateData?.state?.current_puzzle ?? 1;
+    },
+
     async request(endpoint, method = "POST", body = null) {
         const headers = { "Content-Type": "application/json" };
         const guestId = localStorage.getItem("guest_id");
@@ -238,15 +242,19 @@ class GameInterface {
         }
 
         if (!narrative && window.gameCaseData?.puzzles) {
-            const puzzleNum = GameAPI.state?.current_puzzle || 1;
+            const puzzleNum = GameAPI.getPuzzleNumber(GameAPI.state);
             const puzzle = window.gameCaseData.puzzles.find(p => p.number === puzzleNum);
             narrative = puzzle?.narrative;
         }
 
+
         if (narrative) {
-            const puzzleNum = GameAPI.state?.current_puzzle || 1;
+            const puzzleNum = GameAPI.getPuzzleNumber(GameAPI.state);
             const puzzleData = window.gameCaseData?.puzzles?.find(p => p.number === puzzleNum);
-            const imgKey = puzzleData?.image_key;
+
+            const imgKey = (narrative && narrative.includes('[[IMAGE]]'))
+                ? (puzzleData?.image_key || null)
+                : null;
 
             setTimeout(() => {
                 this.queueMessage(narrative, 'narrative', imgKey);
@@ -283,7 +291,7 @@ class GameInterface {
             return;
         }
 
-        const oldPuzzle = GameAPI.state?.current_puzzle || GameAPI.state?.state?.current_puzzle || 1;
+        const oldPuzzle = GameAPI.getPuzzleNumber(GameAPI.state);
 
         this.queueMessage(`\n> ${command}`, 'prompt');
         this.scrollToBottom(true);
@@ -304,11 +312,15 @@ class GameInterface {
                 );
             }
 
-            const imageKey =
-                (res.data.hasOwnProperty("image_key") ? res.data.image_key : null) ??
+            const rawImageKey =
+                (Object.prototype.hasOwnProperty.call(res.data, "image_key") ? res.data.image_key : null) ??
                 res.data.success_image_key ??
                 res.data.failure_image_key ??
                 null;
+
+            const imageKey = (narrativeToShow && narrativeToShow.includes('[[IMAGE]]'))
+                ? rawImageKey
+                : null;
 
             if (res.data.data && narrativeToShow === baseNarrative) {
                 narrativeToShow = "Você executa a consulta. As linhas surgem no monitor.";
@@ -322,7 +334,7 @@ class GameInterface {
 
             GameAPI.state = res.data;
 
-            const newPuzzle = res.data.current_puzzle || res.data.state?.current_puzzle;
+            const newPuzzle = GameAPI.getPuzzleNumber(res.data);
 
             if (newPuzzle && oldPuzzle && newPuzzle > oldPuzzle) {
                 setTimeout(() => {
