@@ -2,6 +2,16 @@ const API_URL = "https://casosdecodigo-5l0x.onrender.com/api";
 const urlParams = new URLSearchParams(window.location.search);
 const CASE_ID = urlParams.get('id') || "caso_0";
 
+const POWER_KEY = "monitor_power";
+
+function getGlobalPowerState() {
+    return localStorage.getItem(POWER_KEY) === "on";
+}
+
+function setGlobalPowerState(isOn) {
+    localStorage.setItem(POWER_KEY, isOn ? "on" : "off");
+}
+
 const GameAPI = {
     state: null,
 
@@ -117,9 +127,9 @@ const GameAPI = {
         return String(val);
     },
 
-        formatHeader(s) {
-    return s.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-}
+    formatHeader(s) {
+        return s.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
 };
 
 class GameInterface {
@@ -136,7 +146,7 @@ class GameInterface {
         this.audioLoop = document.getElementById('music-loop');
         this.sfxPower = document.getElementById('sfx-power');
 
-        this.isPoweredOn = false;
+        this.isPoweredOn = getGlobalPowerState();
         this.messageQueue = [];
         this.isTyping = false;
         this.isSkipping = false;
@@ -148,7 +158,21 @@ class GameInterface {
         window.gameCaseData = null;
 
         this.bindEvents();
+        if (this.isPoweredOn) {
+            this.restorePoweredOnState();
+        }
         this.preloadGameData();
+    }
+
+    restorePoweredOnState() {
+        this.powerLed?.classList.add('on');
+        this.screenArea.classList.replace('screen-off', 'screen-on');
+        if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = 'none';
+
+        this.audioLoop.volume = 0.3;
+        this.audioLoop.play().catch(() => { });
+
+        this.inputEl.disabled = false;
     }
 
     async preloadGameData() {
@@ -219,6 +243,7 @@ class GameInterface {
 
     async turnOn() {
         this.isPoweredOn = true;
+        setGlobalPowerState(true);
         this.powerBtnButton?.classList.add('clicked');
         setTimeout(() => this.powerBtnButton?.classList.remove('clicked'), 150);
         this.powerLed?.classList.add('on');
@@ -246,6 +271,7 @@ class GameInterface {
 
     turnOff() {
         this.isPoweredOn = false;
+        setGlobalPowerState(false);
         this.powerBtnButton?.classList.add('clicked');
         setTimeout(() => this.powerBtnButton?.classList.remove('clicked'), 150);
         this.powerLed?.classList.remove('on');

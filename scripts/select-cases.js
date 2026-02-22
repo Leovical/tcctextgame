@@ -1,5 +1,15 @@
 const API_BASE_URL = "https://casosdecodigo-5l0x.onrender.com/api";
 
+const POWER_KEY = "monitor_power";
+
+function getGlobalPowerState() {
+    return localStorage.getItem(POWER_KEY) === "on";
+}
+
+function setGlobalPowerState(isOn) {
+    localStorage.setItem(POWER_KEY, isOn ? "on" : "off");
+}
+
 const SelectionAPI = {
     async getCases() {
         const token = localStorage.getItem('auth_token');
@@ -52,8 +62,23 @@ class SelectionInterface {
         this.sfxPower = new Audio('audio/startup_button.mp3');
         this.caseListContainer = document.getElementById('case-list');
 
-        this.isPoweredOn = false;
+        this.isPoweredOn = getGlobalPowerState();
+
         this.bindEvents();
+        if (this.isPoweredOn) {
+            this.restorePoweredOnState();
+        }
+    }
+
+    restorePoweredOnState() {
+        this.powerLed?.classList.add('on');
+        this.screenArea.classList.replace('screen-off', 'screen-on');
+        if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = 'none';
+
+        this.audioLoop.volume = 0.2;
+        this.audioLoop.play().catch(() => { });
+
+        this.loadAndRenderCases();
     }
 
     bindEvents() {
@@ -68,6 +93,7 @@ class SelectionInterface {
     turnOn() {
         if (this.isPoweredOn) return;
         this.isPoweredOn = true;
+        setGlobalPowerState(true);
 
         this.powerBtnButton?.classList.add('clicked');
         setTimeout(() => this.powerBtnButton?.classList.remove('clicked'), 150);
@@ -93,6 +119,7 @@ class SelectionInterface {
     turnOff() {
         if (!this.isPoweredOn) return;
         this.isPoweredOn = false;
+        setGlobalPowerState(false);
 
         this.powerBtnButton?.classList.add('clicked');
         setTimeout(() => this.powerBtnButton?.classList.remove('clicked'), 150);
