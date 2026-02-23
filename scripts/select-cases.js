@@ -84,8 +84,8 @@ class SelectionInterface {
 
         if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = '';
 
-        this.audioLoop.pause();
-        this.audioLoop.currentTime = 0;
+        this.audioLoop?.pause();
+        this.audioLoop && (this.audioLoop.currentTime = 0);
 
         if (this.caseListContainer) {
             this.caseListContainer.innerHTML =
@@ -100,8 +100,10 @@ class SelectionInterface {
 
         if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = 'none';
 
-        this.audioLoop.volume = 0.2;
-        this.audioLoop.play().catch(() => { });
+        if (this.audioLoop) {
+            this.audioLoop.volume = 0.2;
+            this.audioLoop.play().catch(() => { });
+        }
 
         this.loadAndRenderCases();
     }
@@ -145,8 +147,10 @@ class SelectionInterface {
 
         setTimeout(() => {
             if (this.isPoweredOn) {
-                this.audioLoop.volume = 0.2;
-                this.audioLoop.play().catch(() => { });
+                if (this.audioLoop) {
+                    this.audioLoop.volume = 0.2;
+                    this.audioLoop.play().catch(() => { });
+                }
 
                 this.loadAndRenderCases();
             }
@@ -173,8 +177,8 @@ class SelectionInterface {
             this.screenArea.classList.add('screen-off');
         }, 500);
 
-        this.audioLoop.pause();
-        this.audioLoop.currentTime = 0;
+        this.audioLoop?.pause();
+        this.audioLoop && (this.audioLoop.currentTime = 0);
 
         if (this.caseListContainer) {
             this.caseListContainer.innerHTML = '<p style="text-align: center; margin-top: 20px;">INICIALIZANDO SISTEMA...</p>';
