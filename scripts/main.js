@@ -187,6 +187,11 @@ class GameInterface {
         this.screenArea.classList.add('screen-on');
         if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = 'none';
 
+        if (this.audioLoop) {
+            this.audioLoop.volume = 0.3;
+            this.audioLoop.play().catch(() => { });
+        }
+
         this.inputEl.disabled = false;
 
         this.maybeStartNarrative();
