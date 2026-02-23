@@ -10,9 +10,8 @@
     <script src="scripts/auth_guard.js"></script>
 </head>
 
-<body>
-    <audio id="bg-music" src="audio/music-loop.mp3" autoplay loop></audio>
 
+<body>
     <main class="menu">
         <header class="menu-header">
             <h2 class="subtitle">AGÊNCIA DE INVESTIGAÇÃO ESPECIAL</h2>
@@ -29,6 +28,22 @@
             <img src="images/settings.png" alt="" />
         </button>
     </main>
+
+    <div id="settings-modal" class="settings-modal hidden">
+        <div class="settings-window">
+            <h3>CONFIGURAÇÕES</h3>
+
+            <div class="setting-row">
+                <label for="volume-slider">VOLUME</label>
+                <input type="range" id="volume-slider" min="0" max="1" step="0.05" />
+            </div>
+
+            <button id="settings-close">FECHAR</button>
+        </div>
+    </div>
+
+    <script src="scripts/audio-settings.js"></script>
+    <audio id="intro-music" src="audio/intro_theme.mp3" loop autoplay></audio>
 </body>
 
 </html>
