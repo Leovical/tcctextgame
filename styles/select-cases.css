@@ -415,16 +415,22 @@ body {
     box-shadow: 0 0 10px var(--phosphor-glow);
 }
 
-.screen-on {
-    animation: turn-on 1.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-    opacity: 1;
-    pointer-events: auto;
+.screen-off {
+    transform: scale(0, 0);
+    opacity: 0;
 }
 
-.screen-off {
-    animation: turn-off 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-    opacity: 0;
-    pointer-events: none;
+.screen-shutting-down {
+    animation: turn-off 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+.screen-on {
+    opacity: 1;
+    transform: scale(1, 1);
+}
+
+.screen-turning-on {
+    animation: turn-on 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
 @keyframes turn-on {

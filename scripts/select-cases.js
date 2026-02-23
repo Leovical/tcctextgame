@@ -65,14 +65,39 @@ class SelectionInterface {
         this.isPoweredOn = getGlobalPowerState();
 
         this.bindEvents();
+
         if (this.isPoweredOn) {
             this.restorePoweredOnState();
+        } else {
+            this.restorePoweredOffState();
         }
     }
+    restorePoweredOffState() {
+        this.powerLed?.classList.remove('on');
 
+        this.screenArea.classList.remove(
+            'screen-on',
+            'screen-turning-on',
+            'screen-shutting-down'
+        );
+        this.screenArea.classList.add('screen-off');
+
+        if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = '';
+
+        this.audioLoop.pause();
+        this.audioLoop.currentTime = 0;
+
+        if (this.caseListContainer) {
+            this.caseListContainer.innerHTML =
+                '<p style="text-align: center; margin-top: 20px;">SISTEMA DESLIGADO</p>';
+        }
+    }
     restorePoweredOnState() {
         this.powerLed?.classList.add('on');
-        this.screenArea.classList.replace('screen-off', 'screen-on');
+
+        this.screenArea.classList.remove('screen-off');
+        this.screenArea.classList.add('screen-on');
+
         if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = 'none';
 
         this.audioLoop.volume = 0.2;
@@ -104,7 +129,19 @@ class SelectionInterface {
 
         if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = 'none';
 
-        this.screenArea.classList.replace('screen-off', 'screen-on');
+        this.screenArea.classList.remove(
+            'screen-off',
+            'screen-shutting-down'
+        );
+        this.screenArea.classList.add('screen-on');
+
+        void this.screenArea.offsetWidth;
+
+        this.screenArea.classList.add('screen-turning-on');
+
+        setTimeout(() => {
+            this.screenArea.classList.remove('screen-turning-on');
+        }, 1100);
 
         setTimeout(() => {
             if (this.isPoweredOn) {
@@ -128,7 +165,14 @@ class SelectionInterface {
 
         if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = '';
 
-        this.screenArea.classList.replace('screen-on', 'screen-off');
+        this.screenArea.classList.remove('screen-on');
+        this.screenArea.classList.add('screen-shutting-down');
+
+        setTimeout(() => {
+            this.screenArea.classList.remove('screen-shutting-down');
+            this.screenArea.classList.add('screen-off');
+        }, 500);
+
         this.audioLoop.pause();
         this.audioLoop.currentTime = 0;
 

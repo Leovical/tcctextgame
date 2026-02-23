@@ -516,13 +516,21 @@ body {
 }
 
 .screen-off {
+    transform: scale(0, 0);
+    opacity: 0;
+}
+
+.screen-shutting-down {
     animation: turn-off 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-    pointer-events: none;
 }
 
 .screen-on {
-    animation: turn-on 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
     opacity: 1;
+    transform: scale(1, 1);
+}
+
+.screen-turning-on {
+    animation: turn-on 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
 .screen-off .game-interface,

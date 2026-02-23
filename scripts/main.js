@@ -137,6 +137,7 @@ class GameInterface {
         this.powerBtnContainer = document.getElementById('power-btn-container');
         this.powerBtnButton = this.powerBtnContainer?.querySelector('.button');
         this.powerLed = document.getElementById('power-led');
+        this.narrativeStarted = false;
         this.mobilePowerBtn = document.getElementById('mobile-power-btn');
         this.submitBtn = document.getElementById('submit-btn');
         this.screenArea = document.getElementById('game-screen-area');
@@ -147,6 +148,7 @@ class GameInterface {
         this.sfxPower = document.getElementById('sfx-power');
 
         this.isPoweredOn = getGlobalPowerState();
+        this.isInitialLoad = true;
         this.messageQueue = [];
         this.isTyping = false;
         this.isSkipping = false;
@@ -155,6 +157,15 @@ class GameInterface {
         this.isProgrammaticScroll = false;
         this.SCROLL_THRESHOLD = 5;
 
+
+        this.screenArea.classList.remove(
+            'screen-on',
+            'screen-shutting-down'
+        );
+        this.screenArea.classList.add('screen-off');
+
+        this.powerLed?.classList.remove('on');
+
         window.gameCaseData = null;
 
         this.bindEvents();
@@ -162,17 +173,23 @@ class GameInterface {
             this.restorePoweredOnState();
         }
         this.preloadGameData();
+        this.isInitialLoad = false;
     }
 
     restorePoweredOnState() {
         this.powerLed?.classList.add('on');
-        this.screenArea.classList.replace('screen-off', 'screen-on');
+
+        this.screenArea.classList.remove(
+            'screen-off',
+            'screen-shutting-down',
+            'screen-turning-on'
+        );
+        this.screenArea.classList.add('screen-on');
         if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = 'none';
 
-        this.audioLoop.volume = 0.3;
-        this.audioLoop.play().catch(() => { });
-
         this.inputEl.disabled = false;
+
+        this.maybeStartNarrative();
     }
 
     async preloadGameData() {
@@ -185,6 +202,7 @@ class GameInterface {
             }
 
             this.updateHeaderTitle(window.gameCaseData.title);
+            this.maybeStartNarrative();
         }
     }
 
@@ -244,29 +262,50 @@ class GameInterface {
     async turnOn() {
         this.isPoweredOn = true;
         setGlobalPowerState(true);
+
         this.powerBtnButton?.classList.add('clicked');
         setTimeout(() => this.powerBtnButton?.classList.remove('clicked'), 150);
+
         this.powerLed?.classList.add('on');
         if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = 'none';
-        this.screenArea.classList.replace('screen-off', 'screen-on');
+
+        this.screenArea.classList.remove(
+            'screen-off',
+            'screen-shutting-down'
+        );
+        this.screenArea.classList.add('screen-on');
+
+        void this.screenArea.offsetWidth;
+
+        this.screenArea.classList.add('screen-turning-on');
+
         this.sfxPower.currentTime = 0;
         this.sfxPower.play().catch(() => { });
 
-        setTimeout(async () => {
-            if (this.isPoweredOn) {
-                this.audioLoop.volume = 0.3;
-                this.audioLoop.play().catch(() => { });
-                this.inputEl.focus();
+        setTimeout(() => {
+            if (!this.isPoweredOn) return;
 
-                this.outputEl.innerHTML = '';
-                this.messageQueue = [];
-                this.isTyping = false;
-                this.isSkipping = false;
-                this.inputEl.disabled = false;
+            this.audioLoop.volume = 0.3;
+            this.audioLoop.play().catch(() => { });
 
-                await this.startNarrative(true);
-            }
+            this.inputEl.disabled = false;
+            this.inputEl.focus();
+
+            this.maybeStartNarrative();
         }, 1200);
+
+        setTimeout(() => {
+            this.screenArea.classList.remove('screen-turning-on');
+        }, 1100);
+    }
+
+    maybeStartNarrative() {
+        if (!this.isPoweredOn) return;
+        if (!GameAPI.state) return;
+        if (this.narrativeStarted) return;
+
+        this.narrativeStarted = true;
+        this.startNarrative(true);
     }
 
     turnOff() {
@@ -276,7 +315,13 @@ class GameInterface {
         setTimeout(() => this.powerBtnButton?.classList.remove('clicked'), 150);
         this.powerLed?.classList.remove('on');
         if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = '';
-        this.screenArea.classList.replace('screen-on', 'screen-off');
+        this.screenArea.classList.remove('screen-on');
+        this.screenArea.classList.add('screen-shutting-down');
+
+        setTimeout(() => {
+            this.screenArea.classList.remove('screen-shutting-down');
+            this.screenArea.classList.add('screen-off');
+        }, 500);
         this.audioLoop.pause();
         this.audioLoop.currentTime = 0;
     }
