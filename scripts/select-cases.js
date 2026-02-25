@@ -111,11 +111,31 @@ class SelectionInterface {
     bindEvents() {
         this.powerBtnContainer?.addEventListener('click', () => this.togglePower());
         this.mobilePowerBtn?.addEventListener('click', () => this.togglePower());
+
+        const btnSairFisico = document.querySelector('.exit-switch');
+        const btnVoltarLista = document.getElementById('btn-voltar');
+        const btnSairMobile = document.querySelector('.mobile-only-btn');
+
+        [btnSairFisico, btnVoltarLista, btnSairMobile].forEach(btn => {
+            btn?.addEventListener('click', () => this.exitSystem());
+        });
     }
 
     togglePower() {
         this.isPoweredOn ? this.turnOff() : this.turnOn();
     }
+
+    exitSystem() {
+    if (this.screenArea) {
+        this.screenArea.classList.add('screen-shutting-down');
+        
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 500);
+    } else {
+        window.location.href = 'index.html';
+    }
+}
 
     turnOn() {
         if (this.isPoweredOn) return;

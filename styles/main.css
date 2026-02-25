@@ -223,50 +223,6 @@ body {
     display: none;
 }
 
-@media screen and (max-width: 1080px) {
-    .mobile-only-btn {
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-
-        z-index: 1000;
-        background: #000;
-        color: var(--phosphor-main);
-
-        border: none;
-        padding: 10px 25px;
-
-        font-family: 'Pixellari', monospace;
-        font-size: 0.9rem;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-
-        box-shadow:
-            0 4px 0 rgba(0, 255, 65, 0.3),
-            inset 0 -2px 0 var(--phosphor-glow);
-
-        clip-path: polygon(0 0, 100% 0,
-                95% 100%, 5% 100%);
-
-        cursor: pointer;
-        transition: all 0.1s;
-    }
-
-    .mobile-only-btn:active {
-        background: var(--phosphor-main);
-        color: #000;
-        transform: translate(-50%, 2px);
-        box-shadow: none;
-    }
-
-    #case-title {
-        padding-top: 35px;
-    }
-}
-
 #power-led {
     width: 1vh;
     height: 1vh;
@@ -695,6 +651,49 @@ body {
 
     .screen-on {
         z-index: 300 !important;
+    }
+
+    /* btn no mobile */
+    .mobile-only-btn {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+
+        z-index: 1000;
+        background: #000;
+        color: var(--phosphor-main);
+
+        border: none;
+        padding: 10px 25px;
+
+        font-family: 'Pixellari', monospace;
+        font-size: 0.9rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+
+        box-shadow:
+            0 4px 0 rgba(0, 255, 65, 0.3),
+            inset 0 -2px 0 var(--phosphor-glow);
+
+        clip-path: polygon(0 0, 100% 0,
+                95% 100%, 5% 100%);
+
+        cursor: pointer;
+        transition: all 0.1s;
+    }
+
+    .mobile-only-btn:active {
+        background: var(--phosphor-main);
+        color: #000;
+        transform: translate(-50%, 2px);
+        box-shadow: none;
+    }
+
+    #case-title {
+        padding-top: 35px;
     }
 }
 
