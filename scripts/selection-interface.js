@@ -1,3 +1,4 @@
+// selection-interface.js
 import { api } from './api.js';
 import { PowerManager } from './power-manager.js';
 
@@ -9,6 +10,12 @@ class SelectionInterface {
         this.screenArea = document.getElementById('game-screen-area');
         this.audioLoop = document.getElementById('music-loop');
         this.caseListContainer = document.getElementById('case-list');
+
+        this.exitButtons = [
+            document.querySelector('.exit-switch'),
+            document.getElementById('btn-exit-case'),
+            document.getElementById('btn-voltar-mobile')
+        ].filter(btn => btn);
 
         this.powerManager = new PowerManager({
             powerBtnContainer: this.powerBtnContainer,
@@ -22,6 +29,24 @@ class SelectionInterface {
         });
 
         this.powerManager.init();
+        this.bindExitEvents();
+    }
+
+    bindExitEvents() {
+        this.exitButtons.forEach(btn => {
+            btn.addEventListener('click', () => this.exitSystem());
+        });
+    }
+
+    exitSystem() {
+        if (this.screenArea) {
+            this.screenArea.classList.add('screen-shutting-down');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 500);
+        } else {
+            window.location.href = 'index.html';
+        }
     }
 
     onPowerOn() {
@@ -88,7 +113,7 @@ class SelectionInterface {
         const stars = '★'.repeat(diffNum) + '☆'.repeat(5 - diffNum);
 
         return `
-            <div class="case-card ${cssClass}" onclick="window.selectionInterface.selectCase('${caso.id}', '${status}')">
+            <div class="case-card ${cssClass}" onclick="window.gameInterface.selectCase('${caso.id}', '${status}')">
                 <div class="card-icon"><img src="${iconPath}" alt="${status}"></div>
                 <div class="card-content">
                     <h2>${caso.title}</h2>
@@ -108,5 +133,5 @@ class SelectionInterface {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    window.selectionInterface = new SelectionInterface();
+    window.gameInterface = new SelectionInterface();
 });

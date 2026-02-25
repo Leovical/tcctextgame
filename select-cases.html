@@ -11,48 +11,37 @@
 </head>
 
 <body>
-
     <div class="container">
         <div class="computer-container">
             <div class="monitor">
                 <div class="monitor-inner">
                     <div class="screen-container">
-
                         <div class="screen" id="game-screen-area">
+
+                            <button id="btn-voltar-mobile" class="mobile-only-btn">VOLTAR</button>
                             <div class="glow-overlay"></div>
-
                             <div class="selection-interface">
-
                                 <div id="case-title">ARQUIVOS DE CASOS</div>
-
                                 <div class="case-list-scroll" id="case-list">
                                     <p style="text-align: center; margin-top: 20px;">CARREGANDO DADOS...</p>
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
                 </div>
-
                 <div class="monitor-bottom">
                     <div class="exit-switch" id="btn-exit-case" title="Retornar aos Arquivos">
                         <div class="button"></div>
                     </div>
-
-
                     <div class="power-switch" id="power-btn-container">
                         <div class="button"></div>
                     </div>
-
                     <div class="power-led" id="power-led"></div>
                 </div>
             </div>
         </div>
     </div>
-
     <button id="mobile-power-btn">LIGAR TERMINAL</button>
-
     <script type="module" src="scripts/selection-interface.js"></script>
 </body>
 
