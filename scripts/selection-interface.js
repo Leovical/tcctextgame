@@ -1,4 +1,4 @@
-// selection-interface.js
+import { setGlobalPowerState } from './storage.js';
 import { api } from './api.js';
 import { PowerManager } from './power-manager.js';
 
@@ -39,6 +39,8 @@ class SelectionInterface {
     }
 
     exitSystem() {
+        setGlobalPowerState(false);
+
         if (this.screenArea) {
             this.screenArea.classList.add('screen-shutting-down');
             setTimeout(() => {
