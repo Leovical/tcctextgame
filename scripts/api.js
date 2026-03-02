@@ -52,6 +52,11 @@ class ApiService {
         }
         return res.data;
     }
+
+    async validateTeam(code) {
+        return await this.request(`/game/team/validate?code=${code}`, "GET");
+    }
+
 }
 
 export const api = new ApiService();

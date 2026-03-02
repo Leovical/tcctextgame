@@ -10,7 +10,6 @@
     <script src="scripts/auth_guard.js"></script>
 </head>
 
-
 <body>
     <main class="menu">
         <header class="menu-header">
@@ -20,9 +19,14 @@
 
         <img src="images/detective.png" alt="Detetive sombrio" class="detective" />
 
-        <a href="select-cases.html" class="play-button">
-            <span>Jogar</span>
-        </a>
+        <div class="action-buttons">
+            <a href="select-cases.html" class="action-button">
+                <span>Jogar</span>
+            </a>
+            <button id="tournament-btn" class="action-button">
+                <span>Torneio</span>
+            </button>
+        </div>
 
         <button class="settings-button" aria-label="Configurações">
             <img src="images/settings.png" alt="" />
@@ -32,16 +36,30 @@
     <div id="settings-modal" class="settings-modal hidden">
         <div class="settings-window">
             <h3>CONFIGURAÇÕES</h3>
-
             <div class="setting-row">
                 <label for="volume-slider">VOLUME</label>
                 <input type="range" id="volume-slider" min="0" max="1" step="0.05" />
             </div>
-
             <button id="settings-close">FECHAR</button>
         </div>
     </div>
 
+    <div id="team-modal" class="settings-modal hidden">
+        <div class="settings-window">
+            <h3>ACESSO AO TORNEIO</h3>
+            <div class="setting-row">
+                <label for="team-code-input">CÓDIGO DO TIME</label>
+                <input type="text" id="team-code-input" placeholder="Ex: ABC123">
+            </div>
+            <div class="team-modal-buttons">
+                <button id="team-modal-cancel" class="team-modal-btn">CANCELAR</button>
+                <button id="team-modal-confirm" class="team-modal-btn">VALIDAR</button>
+            </div>
+            <p id="team-modal-error"></p>
+        </div>
+    </div>
+
+    <script type="module" src="scripts/team-login-modal.js"></script>
     <script src="scripts/audio_settings.js"></script>
     <audio id="intro-music" src="audio/intro_theme.mp3" loop autoplay></audio>
 </body>

@@ -101,36 +101,6 @@ body {
     image-rendering: pixelated;
 }
 
-.play-button {
-    position: absolute;
-    left: 30px;
-    bottom: 30px;
-    width: 210px;
-    height: 80px;
-    border: 2px solid #33FF33;
-    border-radius: 6px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    padding-left: 30px;
-    background: rgba(0, 0, 0, 0.15);
-    color: #33FF33;
-    z-index: 3;
-    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
-}
-
-.play-button span {
-    font-size: 2.2rem;
-    font-weight: normal;
-    letter-spacing: 0.10em;
-    text-shadow: 0 0 2px #33FF33, 0 0 5px #33FF33;
-}
-
-.play-button:hover {
-    background: rgba(0, 40, 0, 0.8);
-    box-shadow: 0 0 12px #33FF33, 0 0 28px #33FF33;
-    transform: translateY(-2px);
-}
 
 .settings-button {
     position: absolute;
@@ -163,17 +133,6 @@ body {
 
     .title {
         font-size: 2.6rem;
-    }
-
-    .play-button {
-        width: 180px;
-        height: 72px;
-        left: 20px;
-        bottom: 20px;
-    }
-
-    .play-button span {
-        font-size: 1.8rem;
     }
 
     .settings-button {
@@ -257,4 +216,140 @@ body {
 #settings-close:hover {
     background: rgba(0, 40, 0, 0.8);
     box-shadow: 0 0 10px #33FF33;
+}
+
+.action-buttons {
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+    display: flex;
+    gap: 20px;
+    z-index: 3;
+}
+
+.action-button {
+    border: 2px solid #33FF33;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.15);
+    color: #33FF33;
+    font-family: 'The Led Display', monospace;
+    font-size: 2.2rem;
+    padding: 0 30px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 2px #33FF33, 0 0 5px #33FF33;
+    line-height: 1;
+}
+
+.action-button:hover {
+    background: rgba(0, 40, 0, 0.8);
+    box-shadow: 0 0 12px #33FF33, 0 0 28px #33FF33;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        left: 20px;
+        bottom: 20px;
+        gap: 10px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .action-button {
+        font-size: 1.8rem;
+        padding: 0 20px;
+        height: 72px;
+    }
+}
+
+#team-modal .settings-window {
+    width: 400px;
+    max-width: 90vw;
+    padding: 20px;
+}
+
+#team-code-input {
+    background: #000;
+    border: 1px solid #33FF33;
+    color: #33FF33;
+    padding: 10px;
+    font-family: 'Pixellari', monospace;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+    font-size: 1rem;
+}
+
+#team-code-input:focus {
+    box-shadow: 0 0 8px #33FF33;
+}
+
+.team-modal-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.team-modal-btn {
+    background: transparent;
+    border: 1px solid #33FF33;
+    color: #33FF33;
+    padding: 10px 0;
+    cursor: pointer;
+    font-family: 'The Led Display', monospace;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+.team-modal-btn:hover {
+    background: rgba(51, 255, 51, 0.2);
+    box-shadow: 0 0 10px #33FF33;
+}
+
+#team-modal-error {
+    color: #ff3333;
+    font-size: 0.9rem;
+    margin-top: 15px;
+    display: none;
+    text-align: center;
+    font-family: 'Pixellari', monospace;
+}
+
+#team-modal-error::first-letter {
+    text-transform: uppercase;
+}
+
+#team-modal-error::after {
+    content: '.';
+}
+
+@media (max-width: 480px) {
+    .team-modal-btn {
+        font-size: 1rem;
+        padding: 8px 0;
+    }
+
+    .team-modal-buttons {
+        gap: 8px;
+    }
+
+    #team-modal .settings-window {
+        padding: 15px;
+    }
+
+    #team-code-input {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
 }
