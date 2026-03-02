@@ -755,3 +755,26 @@ body {
 .evidence-img {
     animation: crt-glow 0.15s infinite;
 }
+
+.player-info {
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+    color: var(--phosphor-main);
+    font-family: 'Pixellari', monospace;
+    font-size: 0.9rem;
+    text-shadow: 0 0 4px var(--phosphor-glow);
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 4px 12px;
+    border: 1px solid var(--phosphor-main);
+    border-radius: 4px;
+    letter-spacing: 1px;
+    display: none;
+}
+
+@media screen and (max-width: 1080px) {
+    .player-info {
+        display: none !important;
+    }
+}

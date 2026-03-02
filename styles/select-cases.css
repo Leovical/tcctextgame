@@ -585,6 +585,50 @@ body {
     }
 
     #case-title {
-        padding-top: 35px; 
+        padding-top: 35px;
     }
+}
+
+.member-selection {
+    margin: 2rem;
+    display: none;
+}
+
+.member-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--phosphor-main);
+    font-family: 'Pixellari', monospace;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.member-select {
+    background: #000;
+    color: var(--phosphor-main);
+    border: 1px solid var(--phosphor-main);
+    padding: 8px 12px;
+    width: 100%;
+    max-width: 300px;
+    font-family: 'Pixellari', monospace;
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    border-radius: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%2333FF33%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+}
+
+.member-select:hover {
+    box-shadow: 0 0 8px var(--phosphor-main);
+}
+
+.member-select option {
+    background: #000;
+    color: var(--phosphor-main);
 }

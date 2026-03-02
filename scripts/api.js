@@ -1,6 +1,7 @@
 import { API_URL } from './config.js';
 import { getGuestId, setGuestId, getAuthToken } from './storage.js';
 
+let sessionId = localStorage.getItem('session_id') || '';
 class ApiService {
     constructor() {
         this.state = null;
@@ -8,6 +9,11 @@ class ApiService {
 
     async request(endpoint, method = "POST", body = null, extraHeaders = {}) {
         const headers = { "Content-Type": "application/json", ...extraHeaders };
+
+        if (sessionId) {
+            headers["X-Session-ID"] = sessionId;
+        }
+
         const guestId = getGuestId();
         if (guestId) headers["X-Guest-ID"] = guestId;
 
@@ -20,6 +26,12 @@ class ApiService {
                 headers,
                 body: body ? JSON.stringify(body) : null
             });
+
+            const newSessionId = response.headers.get("X-Session-ID");
+            if (newSessionId && newSessionId !== sessionId) {
+                sessionId = newSessionId;
+                localStorage.setItem('session_id', sessionId);
+            }
 
             const newGuestId = response.headers.get("X-Guest-ID");
             if (newGuestId) setGuestId(newGuestId);
@@ -35,12 +47,33 @@ class ApiService {
         return await this.request("/cases/initialize", "POST", { case_id: caseId });
     }
 
+    async initializeTournamentCase(caseId, teamCode, matricula) {
+        return await this.request("/cases/initialize", "POST", {
+            case_id: caseId,
+            team_code: teamCode,
+            matricula: matricula
+        });
+    }
+
     async getGameProgress() {
         return await this.request("/game/progress", "GET");
     }
 
     async executeSQL(caseId, sql) {
         return await this.request("/game/execute", "POST", { case_id: caseId, sql });
+    }
+
+    async executeTournamentSQL(caseId, sql, teamCode, matricula) {
+        return await this.request("/game/execute", "POST", {
+            case_id: caseId,
+            sql: sql,
+            team_code: teamCode,
+            matricula: matricula
+        });
+    }
+
+    async tournamentStatus(teamCode) {
+        return await this.request(`/game/tournament/status?team_code=${teamCode}`, "GET");
     }
 
     async getCases() {
@@ -56,7 +89,6 @@ class ApiService {
     async validateTeam(code) {
         return await this.request(`/game/team/validate?code=${code}`, "GET");
     }
-
 }
 
 export const api = new ApiService();
