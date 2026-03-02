@@ -78,6 +78,12 @@ class TeamSelectInterface {
                     option.textContent += ' (já em uso)';
                 }
             });
+            for (let i = 0; i < this.memberSelect.options.length; i++) {
+                if (!this.memberSelect.options[i].disabled) {
+                    this.memberSelect.selectedIndex = i;
+                    break;
+                }
+            }
         }
     }
 
