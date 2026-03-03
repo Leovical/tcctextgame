@@ -353,3 +353,42 @@ body {
         padding: 8px;
     }
 }
+
+.member-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.member-option {
+    background: transparent;
+    border: 1px solid #33FF33;
+    color: #33FF33;
+    padding: 10px;
+    font-family: 'Pixellari', monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.member-option:hover {
+    background: rgba(51, 255, 51, 0.2);
+}
+
+.member-option.selected {
+    background: #33FF33;
+    color: #000;
+}
+
+.member-option:disabled {
+    border-color: #666;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.member-option:disabled:hover {
+    background: transparent;
+}

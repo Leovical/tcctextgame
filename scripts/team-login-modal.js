@@ -1,58 +1,130 @@
 import { api } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('team-modal');
+    const teamModal = document.getElementById('team-modal');
+    const memberModal = document.getElementById('member-modal');
     const tournamentBtn = document.getElementById('tournament-btn');
-    const cancelBtn = document.getElementById('team-modal-cancel');
-    const confirmBtn = document.getElementById('team-modal-confirm');
+    const cancelTeamBtn = document.getElementById('team-modal-cancel');
+    const confirmTeamBtn = document.getElementById('team-modal-confirm');
     const codeInput = document.getElementById('team-code-input');
-    const errorP = document.getElementById('team-modal-error');
+    const teamErrorP = document.getElementById('team-modal-error');
+
+    const memberListDiv = document.getElementById('member-list');
+    const cancelMemberBtn = document.getElementById('member-modal-cancel');
+    const confirmMemberBtn = document.getElementById('member-modal-confirm');
+    const memberErrorP = document.getElementById('member-modal-error');
+
+    let selectedMatricula = null;
+    let teamData = null;
 
     tournamentBtn.addEventListener('click', () => {
-        modal.classList.remove('hidden');
+        teamModal.classList.remove('hidden');
         codeInput.value = '';
-        errorP.style.display = 'none';
+        teamErrorP.style.display = 'none';
         codeInput.focus();
     });
 
-    cancelBtn.addEventListener('click', () => {
-        modal.classList.add('hidden');
+    cancelTeamBtn.addEventListener('click', () => {
+        teamModal.classList.add('hidden');
     });
 
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.add('hidden');
+    teamModal.addEventListener('click', (e) => {
+        if (e.target === teamModal) {
+            teamModal.classList.add('hidden');
         }
     });
 
-    confirmBtn.addEventListener('click', async () => {
+    confirmTeamBtn.addEventListener('click', async () => {
         const code = codeInput.value.trim().toUpperCase();
         if (!code) {
-            errorP.textContent = 'Digite um código.';
-            errorP.style.display = 'block';
+            teamErrorP.textContent = 'Digite um código.';
+            teamErrorP.style.display = 'block';
             return;
         }
 
-        confirmBtn.disabled = true;
-        confirmBtn.textContent = 'VALIDANDO...';
+        confirmTeamBtn.disabled = true;
+        confirmTeamBtn.textContent = 'VALIDANDO...';
 
         try {
             const result = await api.validateTeam(code);
             if (result.ok && result.data.valid) {
-                sessionStorage.setItem('team_code', result.data.team_code);
-                sessionStorage.setItem('team_members', JSON.stringify(result.data.members));
-                sessionStorage.setItem('tournament_cases', JSON.stringify(result.data.cases));
-                window.location.href = 'team-select-case.html';
+                teamData = result.data;
+                teamModal.classList.add('hidden');
+                showMemberSelection();
             } else {
-                errorP.textContent = result.data.error || 'time não encontrado';
-                errorP.style.display = 'block';
+                teamErrorP.textContent = result.data.error || 'time não encontrado';
+                teamErrorP.style.display = 'block';
             }
         } catch (error) {
-            errorP.textContent = 'Erro de conexão.';
-            errorP.style.display = 'block';
+            teamErrorP.textContent = 'Erro de conexão.';
+            teamErrorP.style.display = 'block';
         } finally {
-            confirmBtn.disabled = false;
-            confirmBtn.textContent = 'VALIDAR';
+            confirmTeamBtn.disabled = false;
+            confirmTeamBtn.textContent = 'VALIDAR';
+        }
+    });
+
+    function showMemberSelection() {
+        memberListDiv.innerHTML = '';
+        teamData.members.forEach(member => {
+            const btn = document.createElement('button');
+            btn.className = 'member-option';
+            btn.dataset.matricula = member.matricula;
+            btn.innerHTML = `${member.nome} (${member.matricula})`;
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.member-option').forEach(el => el.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedMatricula = member.matricula;
+            });
+            memberListDiv.appendChild(btn);
+        });
+        memberModal.classList.remove('hidden');
+        memberErrorP.style.display = 'none';
+    }
+
+    cancelMemberBtn.addEventListener('click', () => {
+        memberModal.classList.add('hidden');
+        teamModal.classList.remove('hidden');
+        selectedMatricula = null;
+    });
+
+    confirmMemberBtn.addEventListener('click', async () => {
+        if (!selectedMatricula) {
+            memberErrorP.textContent = 'Selecione uma matrícula.';
+            memberErrorP.style.display = 'block';
+            return;
+        }
+
+        confirmMemberBtn.disabled = true;
+        confirmMemberBtn.textContent = 'RESERVANDO...';
+
+        try {
+            const reserveResult = await api.request('/tournament/reserve', 'POST', {
+                team_code: teamData.team_code,
+                matricula: selectedMatricula
+            });
+            if (reserveResult.ok) {
+                sessionStorage.setItem('team_code', teamData.team_code);
+                sessionStorage.setItem('team_members', JSON.stringify(teamData.members));
+                sessionStorage.setItem('tournament_cases', JSON.stringify(teamData.cases));
+                sessionStorage.setItem('my_matricula', selectedMatricula);
+                window.location.href = 'team-select-case.html';
+            } else {
+                memberErrorP.textContent = reserveResult.data.error || 'Erro ao reservar';
+                memberErrorP.style.display = 'block';
+            }
+        } catch (error) {
+            memberErrorP.textContent = 'Erro de conexão.';
+            memberErrorP.style.display = 'block';
+        } finally {
+            confirmMemberBtn.disabled = false;
+            confirmMemberBtn.textContent = 'SELECIONAR';
+        }
+    });
+
+    memberModal.addEventListener('click', (e) => {
+        if (e.target === memberModal) {
+            memberModal.classList.add('hidden');
         }
     });
 });

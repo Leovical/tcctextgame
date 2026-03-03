@@ -10,22 +10,27 @@ class TeamSelectInterface {
         this.screenArea = document.getElementById('game-screen-area');
         this.audioLoop = document.getElementById('music-loop');
         this.caseListContainer = document.getElementById('case-list');
-        this.memberSelectionDiv = document.getElementById('member-selection');
-        this.memberSelect = document.getElementById('member-select');
 
         this.teamCode = sessionStorage.getItem('team_code');
+        this.myMatricula = sessionStorage.getItem('my_matricula');
         this.members = JSON.parse(sessionStorage.getItem('team_members') || '[]');
         this.cases = JSON.parse(sessionStorage.getItem('tournament_cases') || '[]');
 
-        if (!this.teamCode || !this.members.length || !this.cases.length) {
+        if (!this.teamCode || !this.myMatricula || !this.members.length || !this.cases.length) {
             alert('Dados do torneio não encontrados. Volte ao início.');
             window.location.href = 'index.html';
             return;
         }
 
-        this.memberSelectionDiv.style.display = 'block';
-        this.populateMemberSelect();
-        this.loadProgressions();
+        const member = this.members.find(m => m.matricula === this.myMatricula);
+        const playerInfoEl = document.getElementById('player-info');
+        if (playerInfoEl) {
+            playerInfoEl.textContent = `Agente: ${member ? member.nome : this.myMatricula}`;
+            playerInfoEl.style.display = 'block';
+        }
+
+        const memberSelection = document.getElementById('member-selection');
+        if (memberSelection) memberSelection.style.display = 'none';
 
         this.powerManager = new PowerManager({
             powerBtnContainer: this.powerBtnContainer,
@@ -43,16 +48,6 @@ class TeamSelectInterface {
         this.connectSSE();
     }
 
-    populateMemberSelect() {
-        this.memberSelect.innerHTML = '';
-        this.members.forEach(m => {
-            const option = document.createElement('option');
-            option.value = m.matricula;
-            option.textContent = `${m.nome} (${m.matricula})`;
-            this.memberSelect.appendChild(option);
-        });
-    }
-
     bindEvents() {
         const exitButtons = [
             document.getElementById('btn-exit-case'),
@@ -63,28 +58,10 @@ class TeamSelectInterface {
                 sessionStorage.removeItem('team_code');
                 sessionStorage.removeItem('team_members');
                 sessionStorage.removeItem('tournament_cases');
+                sessionStorage.removeItem('my_matricula');
                 window.location.href = 'index.html';
             });
         });
-    }
-
-    async loadProgressions() {
-        const res = await api.request(`/game/progress?team_code=${this.teamCode}`, "GET");
-        if (res.ok && res.data) {
-            const usedMatriculas = new Set(res.data.map(p => p.matricula));
-            Array.from(this.memberSelect.options).forEach(option => {
-                if (usedMatriculas.has(option.value)) {
-                    option.disabled = true;
-                    option.textContent += ' (já em uso)';
-                }
-            });
-            for (let i = 0; i < this.memberSelect.options.length; i++) {
-                if (!this.memberSelect.options[i].disabled) {
-                    this.memberSelect.selectedIndex = i;
-                    break;
-                }
-            }
-        }
     }
 
     connectSSE() {
@@ -155,12 +132,7 @@ class TeamSelectInterface {
             alert('Esta linha narrativa já está ocupada por outro membro do time.');
             return;
         }
-        const matricula = this.memberSelect.value;
-        if (!matricula) {
-            alert('Selecione sua matrícula antes de escolher o caso.');
-            return;
-        }
-        window.location.href = `game.html?id=${c.id}&team_code=${this.teamCode}&matricula=${matricula}`;
+        window.location.href = `game.html?id=${c.id}&team_code=${this.teamCode}&matricula=${this.myMatricula}`;
     }
 }
 
