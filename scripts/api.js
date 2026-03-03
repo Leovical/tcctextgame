@@ -1,13 +1,14 @@
 import { API_URL } from './config.js';
 import { getGuestId, setGuestId, getAuthToken } from './storage.js';
 
-let sessionId = localStorage.getItem('session_id') || '';
 class ApiService {
     constructor() {
         this.state = null;
     }
 
     async request(endpoint, method = "POST", body = null, extraHeaders = {}) {
+
+        let sessionId = localStorage.getItem('session_id') || '';
         const headers = { "Content-Type": "application/json", ...extraHeaders };
 
         if (sessionId) {
@@ -29,8 +30,7 @@ class ApiService {
 
             const newSessionId = response.headers.get("X-Session-ID");
             if (newSessionId && newSessionId !== sessionId) {
-                sessionId = newSessionId;
-                localStorage.setItem('session_id', sessionId);
+                localStorage.setItem('session_id', newSessionId);
             }
 
             const newGuestId = response.headers.get("X-Guest-ID");
