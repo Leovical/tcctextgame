@@ -1,4 +1,5 @@
 import { api } from './api.js';
+import { API_URL } from './config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const teamModal = document.getElementById('team-modal');
@@ -16,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedMatricula = null;
     let teamData = null;
+    let memberEventSource = null;
 
     tournamentBtn.addEventListener('click', () => {
         teamModal.classList.remove('hidden');
@@ -78,11 +80,45 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             memberListDiv.appendChild(btn);
         });
+
+        // Conectar SSE para atualizações em tempo real
+        if (memberEventSource) memberEventSource.close();
+        memberEventSource = new EventSource(`${API_URL}/tournament/subscribe-members?team_code=${teamData.team_code}`);
+        memberEventSource.addEventListener('member-status', (e) => {
+            const data = JSON.parse(e.data);
+            updateMemberButtons(data.matricula, data.status === 'occupied');
+        });
+        memberEventSource.onerror = () => {
+            console.warn('SSE member error, retrying...');
+            memberEventSource.close();
+            setTimeout(() => showMemberSelection(), 5000);
+        };
+
         memberModal.classList.remove('hidden');
         memberErrorP.style.display = 'none';
     }
 
+    function updateMemberButtons(matricula, occupied) {
+        const btns = document.querySelectorAll('.member-option');
+        btns.forEach(btn => {
+            if (btn.dataset.matricula === matricula) {
+                if (occupied) {
+                    btn.disabled = true;
+                    btn.classList.add('occupied');
+                    if (btn.classList.contains('selected')) {
+                        btn.classList.remove('selected');
+                        selectedMatricula = null;
+                    }
+                } else {
+                    btn.disabled = false;
+                    btn.classList.remove('occupied');
+                }
+            }
+        });
+    }
+
     cancelMemberBtn.addEventListener('click', () => {
+        if (memberEventSource) memberEventSource.close();
         memberModal.classList.add('hidden');
         teamModal.classList.remove('hidden');
         selectedMatricula = null;
@@ -104,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 matricula: selectedMatricula
             });
             if (reserveResult.ok) {
+                if (memberEventSource) memberEventSource.close();
                 sessionStorage.setItem('team_code', teamData.team_code);
                 sessionStorage.setItem('team_members', JSON.stringify(teamData.members));
                 sessionStorage.setItem('tournament_cases', JSON.stringify(teamData.cases));
@@ -124,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     memberModal.addEventListener('click', (e) => {
         if (e.target === memberModal) {
-            memberModal.classList.add('hidden');
+            cancelMemberBtn.click();
         }
     });
 });

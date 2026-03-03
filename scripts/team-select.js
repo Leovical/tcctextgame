@@ -54,7 +54,11 @@ class TeamSelectInterface {
             document.getElementById('btn-voltar-mobile')
         ];
         exitButtons.forEach(btn => {
-            btn?.addEventListener('click', () => {
+            btn?.addEventListener('click', async () => {
+                await api.request('/tournament/release', 'POST', {
+                    team_code: this.teamCode,
+                    matricula: this.myMatricula
+                }).catch(() => { });
                 sessionStorage.removeItem('team_code');
                 sessionStorage.removeItem('team_members');
                 sessionStorage.removeItem('tournament_cases');
@@ -63,6 +67,7 @@ class TeamSelectInterface {
             });
         });
     }
+
 
     connectSSE() {
         const eventSource = new EventSource(`${API_URL}/game/tournament/subscribe?team_code=${this.teamCode}`);
