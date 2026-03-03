@@ -305,7 +305,7 @@ body {
     padding: 10px 0;
     cursor: pointer;
     font-family: 'The Led Display', monospace;
-    font-size: 1.2rem;
+    font-size: 0.9rem;
     transition: all 0.3s ease;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -391,4 +391,9 @@ body {
 
 .member-option:disabled:hover {
     background: transparent;
+}
+
+#member-modal-error {
+    font-size: 0.5rem;
+    margin-top: 1rem;
 }
