@@ -126,11 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     confirmMemberBtn.addEventListener('click', async () => {
+
         if (!selectedMatricula) {
             memberErrorP.textContent = 'Selecione uma matrícula.';
             memberErrorP.style.display = 'block';
             return;
         }
+
 
         confirmMemberBtn.disabled = true;
         confirmMemberBtn.textContent = 'RESERVANDO...';
@@ -140,6 +142,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 team_code: teamData.team_code,
                 matricula: selectedMatricula
             });
+            if (reserveResult.status === 409 && reserveResult.data.error.includes('sessão já possui uma matrícula reservada')) {
+                const myRes = await api.request(`/tournament/my-matricula?team_code=${teamData.team_code}`, 'GET');
+                if (myRes.ok) {
+                    sessionStorage.setItem('team_code', teamData.team_code);
+                    sessionStorage.setItem('team_members', JSON.stringify(teamData.members));
+                    sessionStorage.setItem('tournament_cases', JSON.stringify(teamData.cases));
+                    sessionStorage.setItem('my_matricula', myRes.data.matricula);
+                    window.location.href = 'team-select-case.html';
+                    return;
+                }
+            }
             if (reserveResult.ok) {
                 if (memberWs) memberWs.close();
                 sessionStorage.setItem('team_code', teamData.team_code);
