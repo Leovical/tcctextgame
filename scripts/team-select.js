@@ -10,6 +10,7 @@ class TeamSelectInterface {
         this.screenArea = document.getElementById('game-screen-area');
         this.audioLoop = document.getElementById('music-loop');
         this.caseListContainer = document.getElementById('case-list');
+        this.ws = null;
 
         this.teamCode = sessionStorage.getItem('team_code');
         this.myMatricula = sessionStorage.getItem('my_matricula');
@@ -45,7 +46,7 @@ class TeamSelectInterface {
 
         this.powerManager.init();
         this.bindEvents();
-        this.connectSSE();
+        this.connectWebSocket();
     }
 
     bindEvents() {
@@ -68,17 +69,20 @@ class TeamSelectInterface {
         });
     }
 
-
-    connectSSE() {
-        const eventSource = new EventSource(`${API_URL}/game/tournament/subscribe?team_code=${this.teamCode}`);
-        eventSource.addEventListener('case-status', (e) => {
-            const data = JSON.parse(e.data);
-            this.updateCaseCard(data.case_id, data.status === 'occupied');
-        });
-        eventSource.onerror = () => {
-            console.warn('SSE connection error. Retrying...');
-            eventSource.close();
-            setTimeout(() => this.connectSSE(), 5000);
+    connectWebSocket() {
+        const wsUrl = API_URL.replace('http', 'ws') + `/game/team/ws?team_code=${this.teamCode}`;
+        this.ws = new WebSocket(wsUrl);
+        this.ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.case_id) {
+                this.updateCaseCard(data.case_id, data.status === 'occupied');
+            } else if (data.matricula) {
+                this.updateMemberStatus(data.matricula, data.status === 'occupied');
+            }
+        };
+        this.ws.onclose = () => {
+            console.warn('WebSocket fechado. Tentando reconectar...');
+            setTimeout(() => this.connectWebSocket(), 5000);
         };
     }
 
@@ -92,6 +96,11 @@ class TeamSelectInterface {
             card.classList.remove('blocked');
             card.querySelector('.card-meta span:first-child').textContent = 'DISPONÍVEL';
         }
+    }
+
+    updateMemberStatus(matricula, occupied) {
+        // Opcional: se quiser exibir algo sobre a matrícula na tela de seleção de casos
+        console.log(`Matrícula ${matricula} agora está ${occupied ? 'ocupada' : 'livre'}`);
     }
 
     loadCases() {

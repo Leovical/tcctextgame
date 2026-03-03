@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedMatricula = null;
     let teamData = null;
-    let memberEventSource = null;
+    let memberWs = null;
 
     tournamentBtn.addEventListener('click', () => {
         teamModal.classList.remove('hidden');
@@ -81,16 +81,17 @@ document.addEventListener('DOMContentLoaded', () => {
             memberListDiv.appendChild(btn);
         });
 
-        // Conectar SSE para atualizações em tempo real
-        if (memberEventSource) memberEventSource.close();
-        memberEventSource = new EventSource(`${API_URL}/tournament/subscribe-members?team_code=${teamData.team_code}`);
-        memberEventSource.addEventListener('member-status', (e) => {
-            const data = JSON.parse(e.data);
-            updateMemberButtons(data.matricula, data.status === 'occupied');
-        });
-        memberEventSource.onerror = () => {
-            console.warn('SSE member error, retrying...');
-            memberEventSource.close();
+        if (memberWs) memberWs.close();
+        const wsUrl = API_URL.replace('http', 'ws') + `/game/team/ws?team_code=${teamData.team_code}`;
+        memberWs = new WebSocket(wsUrl);
+        memberWs.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.matricula) {
+                updateMemberButtons(data.matricula, data.status === 'occupied');
+            }
+        };
+        memberWs.onclose = () => {
+            console.warn('WebSocket member fechado. Tentando reconectar...');
             setTimeout(() => showMemberSelection(), 5000);
         };
 
@@ -118,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     cancelMemberBtn.addEventListener('click', () => {
-        if (memberEventSource) memberEventSource.close();
+        if (memberWs) memberWs.close();
         memberModal.classList.add('hidden');
         teamModal.classList.remove('hidden');
         selectedMatricula = null;
@@ -140,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 matricula: selectedMatricula
             });
             if (reserveResult.ok) {
-                if (memberEventSource) memberEventSource.close();
+                if (memberWs) memberWs.close();
                 sessionStorage.setItem('team_code', teamData.team_code);
                 sessionStorage.setItem('team_members', JSON.stringify(teamData.members));
                 sessionStorage.setItem('tournament_cases', JSON.stringify(teamData.cases));

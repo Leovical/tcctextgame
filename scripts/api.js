@@ -87,7 +87,12 @@ class ApiService {
     }
 
     async validateTeam(code) {
-        return await this.request(`/game/team/validate?code=${code}`, "GET");
+        console.log('validateTeam chamado com código:', code);
+        const url = `/game/team/validate?code=${code}`;
+        console.log('URL da requisição:', `${API_URL}${url}`);
+        const result = await this.request(url, "GET");
+        console.log('Resultado da validação:', result);
+        return result;
     }
 }
 
