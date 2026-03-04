@@ -76,8 +76,6 @@ class TeamSelectInterface {
             const data = JSON.parse(event.data);
             if (data.case_id) {
                 this.updateCaseCard(data.case_id, data.status === 'occupied');
-            } else if (data.matricula) {
-                this.updateMemberStatus(data.matricula, data.status === 'occupied');
             }
         };
         this.ws.onclose = () => {
@@ -98,33 +96,63 @@ class TeamSelectInterface {
         }
     }
 
-    updateMemberStatus(matricula, occupied) {
-        // Opcional: se quiser exibir algo sobre a matrícula na tela de seleção de casos
-        console.log(`Matrícula ${matricula} agora está ${occupied ? 'ocupada' : 'livre'}`);
-    }
-
-    loadCases() {
-        this.renderCases();
-    }
-
-    clearCases() {
-        this.caseListContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">SISTEMA DESLIGADO</p>';
-    }
-
-    renderCases() {
+    async loadCases() {
         if (!this.caseListContainer) return;
-        this.caseListContainer.innerHTML = '';
+        this.caseListContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">CARREGANDO...</p>';
 
+        let myCaseId = null;
+        try {
+            const progressRes = await api.request(`/game/progress?team_code=${this.teamCode}`, 'GET');
+
+            if (progressRes.ok && progressRes.data && Array.isArray(progressRes.data)) {
+                const myProg = progressRes.data.find(p => p.matricula === this.myMatricula);
+                if (myProg) {
+                    myCaseId = myProg.case_id;
+                }
+            } else {
+                console.warn('Resposta de progress não é um array, usando vazio');
+            }
+        } catch (error) {
+            console.error('Erro ao buscar progressões:', error);
+        }
+
+        this.caseListContainer.innerHTML = '';
         this.cases.forEach(c => {
-            const card = this.createCaseCard(c);
+            const isMyCase = (c.id === myCaseId);
+            const card = this.createCaseCard(c, isMyCase, myCaseId);
             this.caseListContainer.appendChild(card);
         });
     }
 
-    createCaseCard(c) {
+    createCaseCard(c, isMyCase, myCaseId) {
         const card = document.createElement('div');
-        card.className = `case-card ${c.occupied ? 'blocked' : ''}`;
+        card.className = 'case-card';
         card.setAttribute('data-case-id', c.id);
+
+        let statusText = '';
+        let clickHandler = null;
+
+        if (isMyCase) {
+            card.classList.add('my-case');
+            statusText = 'SEU CASO';
+            clickHandler = () => {
+                window.location.href = `game.html?id=${c.id}&team_code=${this.teamCode}&matricula=${this.myMatricula}`;
+            };
+        } else if (myCaseId) {
+            card.classList.add('blocked');
+            statusText = 'INDISPONÍVEL';
+            clickHandler = () => alert('Você já possui um caso em andamento. Finalize ou reative-o antes de escolher outro.');
+        } else {
+            if (c.occupied) {
+                card.classList.add('blocked');
+                statusText = 'OCUPADO';
+                clickHandler = () => alert('Esta linha narrativa já está ocupada por outro membro do time.');
+            } else {
+                statusText = 'DISPONÍVEL';
+                clickHandler = () => this.selectCase(c);
+            }
+        }
+
         card.innerHTML = `
             <div class="card-icon">
                 <img src="images/icon-folder.png" alt="Caso">
@@ -132,18 +160,26 @@ class TeamSelectInterface {
             <div class="card-content">
                 <h2>${c.title}</h2>
                 <div class="card-meta">
-                    <span>${c.occupied ? 'OCUPADO' : 'DISPONÍVEL'}</span>
+                    <span>${statusText}</span>
                     <span>DIF: ${'★'.repeat(parseInt(c.difficulty) || 1)}</span>
                 </div>
             </div>
         `;
-        card.addEventListener('click', () => this.selectCase(c));
+
+        if (clickHandler) {
+            card.addEventListener('click', clickHandler);
+        }
+
         return card;
     }
 
+    clearCases() {
+        this.caseListContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">SISTEMA DESLIGADO</p>';
+    }
+
     selectCase(c) {
-        if (c.occupied) {
-            alert('Esta linha narrativa já está ocupada por outro membro do time.');
+        if (!this.myMatricula || this.myMatricula === 'null') {
+            alert('Erro: matrícula inválida.');
             return;
         }
         window.location.href = `game.html?id=${c.id}&team_code=${this.teamCode}&matricula=${this.myMatricula}`;

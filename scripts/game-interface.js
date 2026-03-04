@@ -102,8 +102,13 @@ class GameInterface {
 
         const btnExit = document.getElementById('btn-exit-case');
         const btnExitMobile = document.getElementById('btn-voltar-mobile');
-        const handleExit = () => {
+        const handleExit = async () => {
             if (this.isTournament) {
+                await api.request('/game/leave', 'POST', {
+                    case_id: this.caseId,
+                    team_code: this.teamCode,
+                    matricula: this.matricula
+                }).catch(() => { });
                 window.location.href = 'team-select-case.html';
             } else {
                 window.location.href = 'select-cases.html';
@@ -129,7 +134,7 @@ class GameInterface {
 
             if (this.isTournament) {
                 const statusRes = await api.tournamentStatus(this.teamCode);
-                this.teamReady = statusRes.data.ready
+                this.teamReady = statusRes.data.ready;
                 if (statusRes.ok && !statusRes.data.ready) {
                     this.queueMessage("\nAguardando seu time se conectar. Digite CLS quando todos estiverem prontos.", 'system');
                     return;
@@ -137,7 +142,12 @@ class GameInterface {
             }
             this.maybeStartNarrative();
         } else {
-            alert('Erro ao carregar o caso.');
+            if (res.status === 409) {
+                alert('Este caso não está disponível para sua matrícula. Você será redirecionado.');
+                window.location.href = 'team-select-case.html';
+            } else {
+                alert('Erro ao carregar o caso.');
+            }
         }
     }
 
