@@ -26,6 +26,14 @@
                             <div class="game-interface">
                                 <div id="case-title">CARREGANDO ARQUIVO...</div>
                                 <div id="output"></div>
+                                <div id="chat-container" class="chat-container">
+                                    <div class="chat-header">CHAT DA EQUIPE</div>
+                                    <div id="chat-messages" class="chat-messages"></div>
+                                    <div class="chat-input-area">
+                                        <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
+                                        <button id="chat-send">ENVIAR</button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="input-wrapper" id="input-area">
                                 <div class="prompt-label">/prompt</div>
@@ -37,6 +45,11 @@
                 </div>
 
                 <div class="monitor-bottom">
+                    <div class="chat-toggle" id="chat-toggle" title="Abrir/Fechar Chat">
+                        <div class="button"></div>
+                        <span class="chat-notification" id="chat-notification">0</span>
+                    </div>
+
                     <div class="exit-switch" id="btn-exit-case" title="Retornar aos Arquivos">
                         <div class="button"></div>
                     </div>
