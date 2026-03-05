@@ -355,8 +355,19 @@ class GameInterface {
             this.isSkipping = false;
             this.inputEl.disabled = false;
 
-            if (this.isTournament && !this.teamReady) {
-                this.queueMessage("\nAguardando seu time se conectar. Digite CLS quando todos estiverem prontos.", 'system');
+            if (this.isTournament) {
+                const statusRes = await api.tournamentStatus(this.teamCode);
+                this.teamReady = statusRes.data.ready;
+
+                if (this.teamReady) {
+                    const puzzleNum = api.state?.current_puzzle;
+                    const puzzle = window.gameCaseData?.puzzles?.find(p => p.number === puzzleNum);
+                    if (puzzle) {
+                        this.queueMessage(puzzle.narrative, 'narrative', puzzle.image_key);
+                    }
+                } else {
+                    this.queueMessage("\nAguardando seu time se conectar. Digite CLS quando todos estiverem prontos.", 'system');
+                }
             } else {
                 const puzzleNum = api.state?.current_puzzle;
                 const puzzle = window.gameCaseData?.puzzles?.find(p => p.number === puzzleNum);
