@@ -15,9 +15,8 @@ class TeamSelectInterface {
         this.teamCode = sessionStorage.getItem('team_code');
         this.myMatricula = sessionStorage.getItem('my_matricula');
         this.members = JSON.parse(sessionStorage.getItem('team_members') || '[]');
-        this.cases = JSON.parse(sessionStorage.getItem('tournament_cases') || '[]');
 
-        if (!this.teamCode || !this.myMatricula || !this.members.length || !this.cases.length) {
+        if (!this.teamCode || !this.myMatricula || !this.members.length) {
             alert('Dados do torneio não encontrados. Volte ao início.');
             window.location.href = 'index.html';
             return;
@@ -76,6 +75,10 @@ class TeamSelectInterface {
             const data = JSON.parse(event.data);
             if (data.case_id) {
                 this.updateCaseCard(data.case_id, data.status === 'occupied');
+                const caseIdx = this.cases?.findIndex(c => c.id === data.case_id);
+                if (caseIdx !== -1) {
+                    this.cases[caseIdx].occupied = (data.status === 'occupied');
+                }
             }
         };
         this.ws.onclose = () => {
@@ -89,10 +92,12 @@ class TeamSelectInterface {
         if (!card) return;
         if (occupied) {
             card.classList.add('blocked');
-            card.querySelector('.card-meta span:first-child').textContent = 'OCUPADO';
+            const statusSpan = card.querySelector('.card-meta span:first-child');
+            if (statusSpan) statusSpan.textContent = 'OCUPADO';
         } else {
             card.classList.remove('blocked');
-            card.querySelector('.card-meta span:first-child').textContent = 'DISPONÍVEL';
+            const statusSpan = card.querySelector('.card-meta span:first-child');
+            if (statusSpan) statusSpan.textContent = 'DISPONÍVEL';
         }
     }
 
@@ -100,22 +105,28 @@ class TeamSelectInterface {
         if (!this.caseListContainer) return;
         this.caseListContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">CARREGANDO...</p>';
 
-        let myCaseId = null;
         try {
-            const progressRes = await api.request(`/game/progress?team_code=${this.teamCode}`, 'GET');
-
-            if (progressRes.ok && progressRes.data && Array.isArray(progressRes.data)) {
-                const myProg = progressRes.data.find(p => p.matricula === this.myMatricula);
-                if (myProg) {
-                    myCaseId = myProg.case_id;
-                }
-            } else {
-                console.warn('Resposta de progress não é um array, usando vazio');
+            const validateRes = await api.validateTeam(this.teamCode);
+            if (!validateRes.ok || !validateRes.data.valid) {
+                throw new Error('Time inválido');
             }
-        } catch (error) {
-            console.error('Erro ao buscar progressões:', error);
-        }
+            this.cases = validateRes.data.cases;
 
+            const progressRes = await api.request(`/game/progress?team_code=${this.teamCode}`, 'GET');
+            let myCaseId = null;
+            if (progressRes.ok && Array.isArray(progressRes.data)) {
+                const myProg = progressRes.data.find(p => p.matricula === this.myMatricula);
+                if (myProg) myCaseId = myProg.case_id;
+            }
+
+            this.renderCases(myCaseId);
+        } catch (error) {
+            console.error('Erro ao carregar casos:', error);
+            this.caseListContainer.innerHTML = '<p style="text-align:center; color:red;">ERRO AO CARREGAR CASOS</p>';
+        }
+    }
+
+    renderCases(myCaseId) {
         this.caseListContainer.innerHTML = '';
         this.cases.forEach(c => {
             const isMyCase = (c.id === myCaseId);
