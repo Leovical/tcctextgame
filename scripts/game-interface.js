@@ -42,6 +42,8 @@ class GameInterface {
             this.unreadCount = 0;
             this.chatOpen = false;
             this.initChat();
+        } else {
+            document.getElementById('chat-toggle').remove();
         }
 
         this.narrativeStarted = false;
@@ -86,7 +88,7 @@ class GameInterface {
     }
 
     initChat() {
-        console.log("Chamado")
+
         this.chatContainer = document.getElementById('chat-container');
         this.chatMessages = document.getElementById('chat-messages');
         this.chatInput = document.getElementById('chat-input');
