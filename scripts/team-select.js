@@ -169,10 +169,15 @@ class TeamSelectInterface {
                 <img src="images/icon-folder.png" alt="Caso">
             </div>
             <div class="card-content">
-                <h2>${c.title}</h2>
-                <div class="card-meta">
-                    <span>${statusText}</span>
-                    <span>DIF: ${'★'.repeat(parseInt(c.difficulty) || 1)}</span>
+                <div class="card-row">
+                    <div class="card-main-info">
+                        <h2>${c.description}</h2>
+                        <h3>${c.title}</h3>
+                    </div>
+                    <div class="card-meta">
+                        <span>${statusText}</span>
+                        <span>DIF: ${'★'.repeat(parseInt(c.difficulty) || 1)}</span>
+                    </div>
                 </div>
             </div>
         `;
