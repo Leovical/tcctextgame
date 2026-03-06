@@ -1,4 +1,5 @@
 import { getGlobalPowerState, setGlobalPowerState } from './storage.js';
+import { getGameVolume } from './audio_settings.js';
 
 export class PowerManager {
     constructor(options = {}) {
@@ -15,6 +16,8 @@ export class PowerManager {
         } else if (!this.sfxPower) {
             this.sfxPower = new Audio('audio/startup_button.mp3');
         }
+
+        this.sfxPower.volume = getGameVolume();
 
         this.onPowerOn = options.onPowerOn || (() => { });
         this.onPowerOff = options.onPowerOff || (() => { });
@@ -57,6 +60,7 @@ export class PowerManager {
         void this.screenArea.offsetWidth;
         this.screenArea.classList.add('screen-turning-on');
 
+        this.sfxPower.volume = getGameVolume();
         this.sfxPower.currentTime = 0;
         this.sfxPower.play().catch(() => { });
 
@@ -66,8 +70,9 @@ export class PowerManager {
 
         setTimeout(() => {
             if (this.isPoweredOn) {
+                const currentVolume = getGameVolume();
                 if (this.audioLoop) {
-                    this.audioLoop.volume = 0.2;
+                    this.audioLoop.volume = currentVolume;
                     this.audioLoop.play().catch(() => { });
                 }
                 this.onPowerOn();
@@ -105,8 +110,9 @@ export class PowerManager {
         this.screenArea.classList.remove('screen-off', 'screen-shutting-down');
         this.screenArea.classList.add('screen-on');
         if (this.mobilePowerBtn) this.mobilePowerBtn.style.display = 'none';
+        const currentVolume = getGameVolume();
         if (this.audioLoop) {
-            this.audioLoop.volume = 0.2;
+            this.audioLoop.volume = currentVolume;
             this.audioLoop.play().catch(() => { });
         }
         this.onPowerOn();

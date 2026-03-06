@@ -1,6 +1,6 @@
 const VOLUME_KEY = "game_volume";
 
-function getGameVolume() {
+export function getGameVolume() {
     const v = localStorage.getItem(VOLUME_KEY);
     return v !== null ? parseFloat(v) : 0.2;
 }
@@ -11,7 +11,6 @@ function setGameVolume(value) {
         a.volume = value;
     });
 }
-
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("settings-modal");
     const openBtn = document.querySelector(".settings-button");
@@ -19,11 +18,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const slider = document.getElementById("volume-slider");
 
     const volume = getGameVolume();
-    slider.value = volume;
 
     document.querySelectorAll("audio").forEach(a => {
         a.volume = volume;
     });
+
+    if (!modal || !openBtn || !closeBtn || !slider) {
+        return;
+    }
+
+    slider.value = volume;
 
     openBtn.addEventListener("click", () => {
         modal.classList.remove("hidden");
