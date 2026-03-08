@@ -164,23 +164,29 @@ class TeamSelectInterface {
             }
         }
 
+        const difficultyMap = {
+            iniciante: 1,
+            intermediario: 2,
+            dificil: 3
+        };
+
         card.innerHTML = `
-            <div class="card-icon">
-                <img src="images/icon-folder.png" alt="Caso">
+    <div class="card-icon">
+        <img src="images/icon-folder.png" alt="Caso">
+    </div>
+    <div class="card-content">
+        <div class="card-row">
+            <div class="card-main-info">
+                <h2>${c.description}</h2>
+                <h3>${c.title}</h3>
             </div>
-            <div class="card-content">
-                <div class="card-row">
-                    <div class="card-main-info">
-                        <h2>${c.description}</h2>
-                        <h3>${c.title}</h3>
-                    </div>
-                    <div class="card-meta">
-                        <span>${statusText}</span>
-                        <span>DIF: ${'★'.repeat(parseInt(c.difficulty) || 1)}</span>
-                    </div>
-                </div>
+            <div class="card-meta">
+                <span>${statusText}</span>
+                <span>DIF: ${'★'.repeat(difficultyMap[c.difficulty] || 1)}</span>
             </div>
-        `;
+        </div>
+    </div>
+`;
 
         if (clickHandler) {
             card.addEventListener('click', clickHandler);
