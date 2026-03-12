@@ -326,7 +326,9 @@ class GameInterface {
         setTimeout(() => {
             this.queueMessage(narrative, 'narrative', imgKey);
 
-            if (puzzleNum === 6) {
+            const lastPuzzle = window.gameCaseData?.puzzles?.reduce((max, p) => Math.max(max, p.number), 0);
+
+            if (puzzleNum === lastPuzzle) {
                 setTimeout(() => {
                     this.queueMessage("\n\n[ SISTEMA: ARQUIVO FINALIZADO. UTILIZE O BOTÃO 'VOLTAR' PARA RETORNAR AO MENU OU 'RESET' PARA REINICIAR ]", 'system');
                 }, 1500);
