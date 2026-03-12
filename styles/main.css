@@ -270,7 +270,7 @@ body {
     text-shadow: 0 0 4px var(--phosphor-glow);
     z-index: 20;
     font-family: 'VT323', monospace;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     line-height: 1.5;
     width: 100%;
     height: 100%;
@@ -326,7 +326,7 @@ body {
     border: 1px solid rgba(0, 255, 65, 0.4);
     color: var(--phosphor-main);
     font-family: 'VT323', monospace;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     flex-grow: 1;
     outline: none;
     text-shadow: 0 0 3px var(--phosphor-glow);

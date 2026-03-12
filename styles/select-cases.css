@@ -360,7 +360,7 @@ body {
 }
 
 .card-content h2 {
-    font-size: 2rem;
+    font-size: 1.6rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: normal;
@@ -379,7 +379,7 @@ body {
 }
 
 .card-meta {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
