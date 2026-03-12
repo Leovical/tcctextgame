@@ -1,12 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 @font-face {
     font-family: 'The Led Display';
     src: url('../fonts/TheLedDisplay.ttf') format('truetype');
 }
 
-@font-face {
-    font-family: 'Pixellari';
-    src: url('../fonts/Pixellari.ttf') format('truetype');
-}
 
 * {
     margin: 0;
@@ -280,11 +278,11 @@ body {
     border: 1px solid #33FF33;
     color: #33FF33;
     padding: 10px;
-    font-family: 'Pixellari', monospace;
+    font-family: 'VT323', monospace;
     width: 100%;
     box-sizing: border-box;
     outline: none;
-    font-size: 1rem;
+    font-size: 1.3rem;
 }
 
 #team-code-input:focus {
@@ -323,7 +321,7 @@ body {
     margin-top: 15px;
     display: none;
     text-align: center;
-    font-family: 'Pixellari', monospace;
+    font-family: 'VT323', monospace;
 }
 
 #team-modal-error::first-letter {
@@ -368,7 +366,7 @@ body {
     border: 1px solid #33FF33;
     color: #33FF33;
     padding: 10px;
-    font-family: 'Pixellari', monospace;
+    font-family: 'VT323', monospace;
     cursor: pointer;
     transition: all 0.2s;
     text-align: left;

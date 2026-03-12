@@ -1,11 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 @font-face {
     font-family: 'The Led Display';
     src: url('../fonts/TheLedDisplay.ttf') format('truetype');
-}
-
-@font-face {
-    font-family: 'Pixellari';
-    src: url('../fonts/Pixellari.ttf') format('truetype');
 }
 
 * {
@@ -173,7 +170,7 @@ fieldset.bottom-box {
     border: none;
     outline: none;
     color: #33FF33;
-    font-family: "Pixellari", sans-serif;
+    font-family: "VT323", sans-serif;
     font-size: 1.5rem;
     letter-spacing: 2px;
     width: 100%;
@@ -227,7 +224,7 @@ fieldset.bottom-box {
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
-    font-family: "Pixellari", sans-serif;
+    font-family: "VT323", sans-serif;
     font-size: 1rem;
 }
 

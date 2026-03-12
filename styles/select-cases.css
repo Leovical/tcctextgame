@@ -1,11 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 @font-face {
     font-family: 'The Led Display';
     src: url('../fonts/TheLedDisplay.ttf') format('truetype');
-}
-
-@font-face {
-    font-family: 'Pixellari';
-    src: url('../fonts/Pixellari.ttf') format('truetype');
 }
 
 :root {
@@ -324,7 +321,7 @@ body {
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     margin-left: 2px;
-    font-family: 'Pixellari', monospace;
+    font-family: 'VT323', monospace;
 }
 
 
@@ -363,7 +360,7 @@ body {
 }
 
 .card-content h2 {
-    font-size: 1.3rem;
+    font-size: 2rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: normal;
@@ -382,7 +379,7 @@ body {
 }
 
 .card-meta {
-    font-size: 0.9rem;
+    font-size: 1.5rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -565,7 +562,7 @@ body {
         background: var(--phosphor-main);
         color: #000;
         border: 2px solid var(--phosphor-glow);
-        font-family: 'Pixellari', monospace;
+        font-family: 'VT323', monospace;
         font-size: 1.2rem;
         font-weight: bold;
         z-index: 9999;
@@ -590,7 +587,7 @@ body {
         color: var(--phosphor-main);
         border: none;
         padding: 10px 25px;
-        font-family: 'Pixellari', monospace;
+        font-family: 'VT323', monospace;
         font-size: 0.9rem;
         font-weight: bold;
         text-transform: uppercase;
@@ -622,7 +619,7 @@ body {
     display: block;
     margin-bottom: 8px;
     color: var(--phosphor-main);
-    font-family: 'Pixellari', monospace;
+    font-family: 'VT323', monospace;
     font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -635,7 +632,7 @@ body {
     padding: 8px 12px;
     width: 100%;
     max-width: 300px;
-    font-family: 'Pixellari', monospace;
+    font-family: 'VT323', monospace;
     font-size: 1rem;
     outline: none;
     cursor: pointer;
