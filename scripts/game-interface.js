@@ -203,12 +203,6 @@ class GameInterface {
         sessionStorage.setItem(key, JSON.stringify(messages));
     }
 
-    loadChatMessages() {
-        const key = `chat_${this.teamCode}`;
-        const messages = JSON.parse(sessionStorage.getItem(key) || '[]');
-        messages.forEach(msg => this.displayChatMessage(msg, false));
-    }
-
     toggleChat() {
         this.chatOpen = !this.chatOpen;
         if (this.chatOpen) {
@@ -227,34 +221,6 @@ class GameInterface {
         } else {
             this.chatNotification.classList.remove('has-unread');
         }
-    }
-
-    sendChatMessage() {
-        if (!this.isTournament) return;
-        const msg = this.chatInput.value.trim();
-        if (!msg) return;
-        if (msg.length > 500) {
-            this.showMessage('Mensagem muito longa (máx 500 caracteres)');
-            return;
-        }
-        const member = this.members.find(m => m.matricula === this.matricula);
-        const userName = member ? member.nome : this.matricula;
-        this.chatWs.send(JSON.stringify({
-            user: userName,
-            matricula: this.matricula,
-            message: msg
-        }));
-        this.chatInput.value = '';
-        this.charCounter.textContent = '0/500';
-        this.charCounter.style.color = 'var(--phosphor-main)';
-    }
-
-    displayChatMessage(data) {
-        const div = document.createElement('div');
-        div.className = 'chat-message';
-        div.innerHTML = `<span class="user">${data.user}:</span> <span class="text">${data.message}</span>`;
-        this.chatMessages.appendChild(div);
-        this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
     }
 
     async onPowerOn() {
