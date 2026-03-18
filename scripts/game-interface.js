@@ -159,13 +159,8 @@ class GameInterface {
         div.innerHTML = `<span class="user">${data.user}:</span> <span class="text">${data.message}</span>`;
         this.chatMessages.appendChild(div);
         this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
-
         if (save) {
-            const key = `chat_${this.teamCode}`;
-            const messages = JSON.parse(sessionStorage.getItem(key) || '[]');
-            messages.push(data);
-            if (messages.length > 100) messages.shift();
-            sessionStorage.setItem(key, JSON.stringify(messages));
+            this.saveChatMessage(data);
         }
     }
 
@@ -191,6 +186,27 @@ class GameInterface {
         } catch (e) {
             this.showMessage('Falha ao enviar mensagem. Tente novamente.', 3000);
         }
+    }
+
+    saveChatMessage(data) {
+        const key = `chat_${this.teamCode}`;
+        let messages = JSON.parse(sessionStorage.getItem(key) || '[]');
+        messages.push({
+            user: data.user,
+            message: data.message,
+            timestamp: Date.now()
+        });
+
+        if (messages.length > 200) {
+            messages = messages.slice(-200);
+        }
+        sessionStorage.setItem(key, JSON.stringify(messages));
+    }
+
+    loadChatMessages() {
+        const key = `chat_${this.teamCode}`;
+        const messages = JSON.parse(sessionStorage.getItem(key) || '[]');
+        messages.forEach(msg => this.displayChatMessage(msg, false));
     }
 
     toggleChat() {
