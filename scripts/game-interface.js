@@ -115,24 +115,82 @@ class GameInterface {
 
         this.chatToggle.addEventListener('click', () => (this.toggleChat()));
 
+        const saved = sessionStorage.getItem(`chat_${this.teamCode}`);
+        if (saved) {
+            JSON.parse(saved).forEach(msg => this.displayChatMessage(msg, false));
+        }
+
+        this.connectWebSocket();
+
+        this.chatSend.addEventListener('click', () => this.sendChatMessage());
+        this.chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.sendChatMessage();
+            }
+        });
+    }
+
+    connectWebSocket() {
         const wsUrl = API_URL.replace('http', 'ws') + `/chat/ws?team_code=${this.teamCode}`;
         this.chatWs = new WebSocket(wsUrl);
         this.chatWs.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            this.displayChatMessage(data);
+            this.displayChatMessage(data, true);
             if (!this.chatOpen) {
                 this.unreadCount++;
                 this.updateNotification();
             }
         };
         this.chatWs.onclose = () => {
-            console.warn('Chat WebSocket fechado');
+            console.warn('Chat WebSocket fechado, reconectando...');
+            setTimeout(() => this.connectWebSocket(), 3000);
         };
+        this.chatWs.onerror = (err) => {
+            console.error('Chat WebSocket erro', err);
+            this.showMessage('Erro na conexão do chat', 3000);
+        };
+    }
 
-        this.chatSend.addEventListener('click', () => this.sendChatMessage());
-        this.chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.sendChatMessage();
-        });
+    displayChatMessage(data, save = true) {
+        const div = document.createElement('div');
+        div.className = 'chat-message';
+        div.innerHTML = `<span class="user">${data.user}:</span> <span class="text">${data.message}</span>`;
+        this.chatMessages.appendChild(div);
+        this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+
+        if (save) {
+            const key = `chat_${this.teamCode}`;
+            const messages = JSON.parse(sessionStorage.getItem(key) || '[]');
+            messages.push(data);
+            if (messages.length > 100) messages.shift();
+            sessionStorage.setItem(key, JSON.stringify(messages));
+        }
+    }
+
+    sendChatMessage() {
+        if (!this.isTournament) return;
+        const msg = this.chatInput.value.trim();
+        if (!msg) return;
+        if (msg.length > 500) {
+            this.showMessage('Mensagem muito longa (máx 500 caracteres)');
+            return;
+        }
+        const member = this.members.find(m => m.matricula === this.matricula);
+        const userName = member ? member.nome : this.matricula;
+        try {
+            this.chatWs.send(JSON.stringify({
+                user: userName,
+                matricula: this.matricula,
+                message: msg
+            }));
+            this.chatInput.value = '';
+            this.charCounter.textContent = '0/500';
+            this.charCounter.style.color = 'var(--phosphor-main)';
+        } catch (e) {
+            this.showMessage('Falha ao enviar mensagem. Tente novamente.', 3000);
+        }
     }
 
     toggleChat() {
@@ -208,6 +266,10 @@ class GameInterface {
 
         document.addEventListener('keydown', (e) => {
             if (!this.powerManager.isPoweredOn) return;
+
+            if (this.chatInput && document.activeElement === this.chatInput) {
+                return;
+            }
 
             if (e.key === 'Enter' && document.activeElement !== this.inputEl) {
                 e.preventDefault();
@@ -330,7 +392,7 @@ class GameInterface {
 
             if (puzzleNum === lastPuzzle) {
                 setTimeout(() => {
-                    this.queueMessage("\n\n[ SISTEMA: ARQUIVO FINALIZADO. UTILIZE O BOTÃO 'VOLTAR' PARA RETORNAR AO MENU OU 'RESET' PARA REINICIAR ]", 'system');
+                    this.queueMessage("\n\n[ SISTEMA: ARQUIVO FINALIZADO. UTILIZE O BOTÃO DE VOLTAR PARA RETORNAR AO MENU OU 'RESET' PARA REINICIAR ]", 'system');
                 }, 1500);
             }
         }, 100);
