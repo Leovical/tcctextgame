@@ -885,6 +885,7 @@ body {
     background: #111;
     color: #0f0;
     font-size: 0.9rem;
+    text-shadow: none;
 }
 
 .chat-message {
