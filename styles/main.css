@@ -263,6 +263,7 @@ body {
 }
 
 .game-interface {
+    position: relative;
     flex-grow: 1;
     padding: 30px;
     overflow-y: auto;
@@ -1151,4 +1152,39 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.focus-indicator {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--phosphor-main);
+    padding: 4px 12px;
+    font-family: 'VT323', monospace;
+    font-size: 1rem;
+    color: var(--phosphor-main);
+    text-shadow: 0 0 3px var(--phosphor-glow);
+    border-radius: 4px;
+    z-index: 100;
+    letter-spacing: 1px;
+    backdrop-filter: blur(2px);
+}
+
+@media (max-width: 768px) {
+    .focus-indicator {
+        top: 10px;
+        right: 10px;
+        font-size: 0.8rem;
+        padding: 2px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .focus-indicator {
+        top: 5px;
+        right: 5px;
+        font-size: 0.7rem;
+        padding: 2px 6px;
+    }
 }
