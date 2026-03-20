@@ -860,6 +860,7 @@ body {
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
     transform: translateX(120%);
     transition: transform 0.3s ease-in-out;
+    margin-right: 1rem;
 }
 
 .chat-container.open {
