@@ -55,6 +55,8 @@ class GameInterface {
         } else {
             document.getElementById('chat-toggle').remove();
         }
+        this.initDicas();
+        this.initAnotacoes();
 
         this.narrativeStarted = false;
         this.messageQueue = [];
@@ -214,6 +216,7 @@ class GameInterface {
     }
 
     toggleChat() {
+        this.closeAllModals();
         this.chatOpen = !this.chatOpen;
         if (this.chatOpen) {
             this.chatContainer.classList.add('open');
@@ -666,6 +669,237 @@ class GameInterface {
 
         requestAnimationFrame(() => {
             this.isProgrammaticScroll = false;
+        });
+    }
+    insertControlButton(btn) {
+        const bottom = document.querySelector('.monitor-bottom');
+        if (bottom) {
+            bottom.insertBefore(btn, bottom.firstChild);
+        } else {
+            let controls = document.getElementById('game-controls');
+            if (!controls) {
+                controls = document.createElement('div');
+                controls.id = 'game-controls';
+                controls.className = 'game-controls';
+                document.querySelector('.game-interface')?.appendChild(controls) || document.body.appendChild(controls);
+            }
+            controls.appendChild(btn);
+        }
+    }
+
+    initDicas() {
+        if (document.getElementById('dicas-btn')) return;
+
+        const dicasBtn = document.createElement('div');
+        dicasBtn.id = 'dicas-btn';
+        dicasBtn.className = 'chat-toggle';
+        dicasBtn.innerHTML = '<div class="button"><i class="fa-solid fa-lightbulb"></i></div>';
+        dicasBtn.title = 'Dicas do sistema';
+
+        const dicasSlides = [
+            {
+                titulo: 'Comandos Básicos',
+                conteudo: '<p><strong>Comandos disponíveis:</strong> AJUDA, OLHAR, LIMPAR, RESET (e comandos SQL).</p>'
+            },
+            {
+                titulo: 'Ajuda SQL',
+                conteudo: '<p><strong>Se precisar relembrar a sintaxe SQL, utilize os comandos de ajuda, como AJUDA SELECT.</strong></p>'
+            },
+            {
+                titulo: 'Nomes de Tabela',
+                conteudo: '<p><strong>Nomes de tabela podem estar em itálico ou destacados em cor amarela, preste atenção!</strong></p>'
+            },
+            {
+                titulo: 'Nomes de Objetos',
+                conteudo: '<p><strong>Nomes de objetos geralmente estão em maiúsculo. Ex: MESA</strong></p>'
+            },
+            {
+                titulo: 'Cores dos Objetos',
+                conteudo: `
+                <p><strong>Cores dos objetos (ao usar OLHAR):</strong></p>
+                <ul style="list-style:none; padding-left:0;">
+                    <li><span style="color: #0f0;">Verde</span> - objeto ainda não examinado.</li>
+                    <li><span style="color: #f00;">Vermelho</span> - objeto já examinado.</li>
+                    <li><span style="color: #ff0;">Amarelo</span> - objeto examinado, mas sua descrição mudou desde a última vez.</li>
+                </ul>
+            `
+            },
+            {
+                titulo: 'Limpeza da Tela',
+                conteudo: '<p><strong>Se a tela estiver muito cheia de comandos e erros, use o comando "LIMPAR". A narrativa mais atual será reexibida em seguida!</strong></p>'
+            },
+            {
+                titulo: 'Navegação',
+                conteudo: '<p><strong>Use as setas ↑↓ para navegar entre comandos anteriores.</strong></p>'
+            }
+        ];
+
+        let currentSlide = 0;
+
+        const dicasModal = document.createElement('div');
+        dicasModal.id = 'dicas-modal';
+        dicasModal.className = 'chat-container';
+        dicasModal.style.width = '450px';
+        dicasModal.style.height = 'auto';
+        dicasModal.style.maxHeight = '80vh';
+
+        const updateSlide = () => {
+            const slide = dicasSlides[currentSlide];
+            dicasModal.querySelector('.modal-content').innerHTML = slide.conteudo;
+            dicasModal.querySelector('.modal-title').textContent = slide.titulo;
+
+            const prevBtn = dicasModal.querySelector('.prev-slide');
+            const nextBtn = dicasModal.querySelector('.next-slide');
+            if (prevBtn) prevBtn.disabled = currentSlide === 0;
+            if (nextBtn) nextBtn.disabled = currentSlide === dicasSlides.length - 1;
+        };
+
+        dicasModal.innerHTML = `
+        <div class="chat-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <button class="prev-slide" style="background:transparent; border:none; color:#000; font-size:1.2rem; cursor:pointer; ${currentSlide === 0 ? 'opacity:0.3; pointer-events:none;' : ''}">←</button>
+            <span class="modal-title"><i class="fa-solid fa-lightbulb"></i> Dicas do Sistema</span>
+            <button class="next-slide" style="background:transparent; border:none; color:#000; font-size:1.2rem; cursor:pointer; ${currentSlide === dicasSlides.length - 1 ? 'opacity:0.3; pointer-events:none;' : ''}">→</button>
+            <span style="cursor:pointer; margin-left:auto;" class="close-modal">&times;</span>
+        </div>
+        <div class="chat-messages modal-content" style="flex-grow:1; overflow-y:auto; padding:10px;">
+            ${dicasSlides[0].conteudo}
+        </div>
+        <div style="text-align:center; padding:5px; font-size:0.8rem;">
+            ${currentSlide + 1}/${dicasSlides.length}
+        </div>
+    `;
+
+        this.insertControlButton(dicasBtn);
+        const gameInterface = document.querySelector('.game-interface');
+        if (gameInterface) {
+            gameInterface.appendChild(dicasModal);
+        } else {
+            document.body.appendChild(dicasModal);
+        }
+        const prevBtn = dicasModal.querySelector('.prev-slide');
+        const nextBtn = dicasModal.querySelector('.next-slide');
+        const titleSpan = dicasModal.querySelector('.modal-title');
+        const contentDiv = dicasModal.querySelector('.modal-content');
+        const counterDiv = dicasModal.querySelector('div:last-child');
+
+        const updateUI = () => {
+            const slide = dicasSlides[currentSlide];
+            titleSpan.innerHTML = `<i class="fa-solid fa-lightbulb"></i> ${slide.titulo}`;
+            contentDiv.innerHTML = slide.conteudo;
+            counterDiv.textContent = `${currentSlide + 1}/${dicasSlides.length}`;
+
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === dicasSlides.length - 1;
+
+            prevBtn.style.opacity = currentSlide === 0 ? '0.3' : '1';
+            prevBtn.style.pointerEvents = currentSlide === 0 ? 'none' : 'auto';
+            nextBtn.style.opacity = currentSlide === dicasSlides.length - 1 ? '0.3' : '1';
+            nextBtn.style.pointerEvents = currentSlide === dicasSlides.length - 1 ? 'none' : 'auto';
+        };
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateUI();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < dicasSlides.length - 1) {
+                currentSlide++;
+                updateUI();
+            }
+        });
+
+        dicasBtn.addEventListener('click', () => {
+            const isOpen = dicasModal.classList.contains('open');
+            this.closeAllModals();
+            if (!isOpen) {
+                dicasModal.classList.add('open');
+            }
+        });
+
+        const closeBtn = dicasModal.querySelector('.close-modal');
+        closeBtn.addEventListener('click', () => {
+            dicasModal.classList.remove('open');
+        });
+
+        dicasModal.addEventListener('click', (e) => {
+            if (e.target === dicasModal) dicasModal.classList.remove('open');
+        });
+    }
+
+    initAnotacoes() {
+        if (this.isTournament) return;
+        if (document.getElementById('anotacoes-btn')) return;
+
+        const anotacoesBtn = document.createElement('div');
+        anotacoesBtn.id = 'anotacoes-btn';
+        anotacoesBtn.className = 'chat-toggle';
+        anotacoesBtn.innerHTML = '<div class="button"><i class="fa-solid fa-pen-to-square"></i></div>';
+        anotacoesBtn.title = 'Anotações';
+
+        const anotacoesModal = document.createElement('div');
+        anotacoesModal.id = 'anotacoes-modal';
+        anotacoesModal.className = 'chat-container';
+        anotacoesModal.style.width = '400px';
+        anotacoesModal.style.height = 'auto';
+        anotacoesModal.style.maxHeight = '80vh';
+        anotacoesModal.innerHTML = `
+    <div class="chat-header">
+        <i class="fa-regular fa-note-sticky"></i> Anotações
+        <span style="float:right; cursor:pointer;" class="close-modal">&times;</span>
+    </div>
+    <div class="chat-messages" style="flex-grow:1; overflow-y:auto; padding:10px;">
+        <textarea id="anotacoes-text" placeholder="Escreva suas observações aqui..." 
+            style="width:100%; background:#111; border:1px solid var(--phosphor-main); color:var(--phosphor-main); font-family:inherit; padding:8px; box-sizing:border-box; resize:none; white-space:pre-wrap; word-wrap:break-word;"></textarea>
+    </div>
+`;
+
+        this.insertControlButton(anotacoesBtn);
+        const gameInterface = document.querySelector('.game-interface');
+        if (gameInterface) {
+            gameInterface.appendChild(anotacoesModal);
+        } else {
+            document.body.appendChild(anotacoesModal);
+        }
+
+        const storageKey = `notes_${this.caseId}`;
+        const textarea = anotacoesModal.querySelector('#anotacoes-text');
+        const saved = localStorage.getItem(storageKey);
+        if (saved) textarea.value = saved;
+
+        textarea.addEventListener('input', () => {
+            localStorage.setItem(storageKey, textarea.value);
+        });
+
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.stopPropagation();
+            }
+        });
+
+        anotacoesBtn.addEventListener('click', () => {
+            const isOpen = anotacoesModal.classList.contains('open');
+            this.closeAllModals();
+            if (!isOpen) {
+                anotacoesModal.classList.add('open');
+            }
+        });
+
+        const closeBtn = anotacoesModal.querySelector('.close-modal');
+        closeBtn.addEventListener('click', () => {
+            anotacoesModal.classList.remove('open');
+        });
+        anotacoesModal.addEventListener('click', (e) => {
+            if (e.target === anotacoesModal) anotacoesModal.classList.remove('open');
+        });
+    }
+    closeAllModals() {
+        const modals = ['chat-container', 'dicas-modal', 'anotacoes-modal'];
+        modals.forEach(id => {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('open');
         });
     }
 }
