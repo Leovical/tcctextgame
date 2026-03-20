@@ -69,6 +69,18 @@ class GameInterface {
 
         window.gameCaseData = null;
 
+        this.focusIndicator = document.createElement('div');
+        this.focusIndicator.id = 'focus-indicator';
+        this.focusIndicator.className = 'focus-indicator';
+        this.focusIndicator.textContent = 'FOCO: --';
+
+        const gameInterfaceContainer = document.querySelector('.game-interface');
+        if (gameInterfaceContainer) {
+            gameInterfaceContainer.appendChild(this.focusIndicator);
+        } else {
+            document.body.appendChild(this.focusIndicator);
+        }
+
         this.powerManager = new PowerManager({
             powerBtnContainer: this.powerBtnContainer,
             powerLed: this.powerLed,
@@ -90,6 +102,13 @@ class GameInterface {
         }
     }
 
+    updateFocusIndicator() {
+        if (!this.focusIndicator) return;
+        const focusObj = api.state?.current_focus;
+        const focusText = focusObj ? String(focusObj).toUpperCase() : 'NENHUM';
+        this.focusIndicator.textContent = `FOCO: ${focusText}`;
+    }
+
     showMessage(text, duration = 3000) {
         this.notification.textContent = text;
         this.notification.classList.add('show');
@@ -100,7 +119,6 @@ class GameInterface {
     }
 
     initChat() {
-
         this.chatContainer = document.getElementById('chat-container');
         this.chatMessages = document.getElementById('chat-messages');
         this.chatInput = document.getElementById('chat-input');
@@ -265,6 +283,7 @@ class GameInterface {
         localStorage.setItem(this.commandHistoryStorageKey, JSON.stringify(this.commandHistory));
         this.historyIndex = -1;
     }
+
     navigateHistory(direction) {
         if (!this.commandHistory.length) return;
 
@@ -368,6 +387,7 @@ class GameInterface {
 
             if (res.data.progression) {
                 api.state = res.data.progression;
+                this.updateFocusIndicator();
             }
 
             this.updateHeaderTitle(window.gameCaseData.title);
@@ -529,6 +549,7 @@ class GameInterface {
             }
 
             api.state = res.data.state;
+            this.updateFocusIndicator();
 
             const newPuzzle = api.state?.current_puzzle;
             if (newPuzzle && oldPuzzle && newPuzzle > oldPuzzle) {
@@ -671,6 +692,7 @@ class GameInterface {
             this.isProgrammaticScroll = false;
         });
     }
+
     insertControlButton(btn) {
         const bottom = document.querySelector('.monitor-bottom');
         if (bottom) {
@@ -776,6 +798,7 @@ class GameInterface {
         } else {
             document.body.appendChild(dicasModal);
         }
+
         const prevBtn = dicasModal.querySelector('.prev-slide');
         const nextBtn = dicasModal.querySelector('.next-slide');
         const titleSpan = dicasModal.querySelector('.modal-title');
@@ -891,10 +914,12 @@ class GameInterface {
         closeBtn.addEventListener('click', () => {
             anotacoesModal.classList.remove('open');
         });
+
         anotacoesModal.addEventListener('click', (e) => {
             if (e.target === anotacoesModal) anotacoesModal.classList.remove('open');
         });
     }
+
     closeAllModals() {
         const modals = ['chat-container', 'dicas-modal', 'anotacoes-modal'];
         modals.forEach(id => {
