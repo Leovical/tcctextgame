@@ -23,6 +23,16 @@ class GameInterface {
         this.isTournament = !!(this.teamCode && this.matricula);
         this.teamReady = false;
 
+        if (this.caseId) {
+            const storageKey = `commandHistory_${this.caseId}_${this.matricula || 'single'}`;
+            this.commandHistory = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            this.historyIndex = -1;
+            this.commandHistoryStorageKey = storageKey;
+        } else {
+            this.commandHistory = [];
+            this.historyIndex = -1;
+        }
+
         if (!this.caseId) {
             alert('Nenhum caso especificado.');
             window.location.href = 'select-cases.html';
@@ -236,7 +246,58 @@ class GameInterface {
         this.inputEl.disabled = true;
     }
 
+    addToHistory(command) {
+        if (!command) return;
+        const lower = command.toLowerCase();
+        if (['clear', 'limpar', 'cls'].includes(lower)) return;
+
+        if (this.commandHistory.length > 0 && this.commandHistory[this.commandHistory.length - 1] === command) {
+            return;
+        }
+
+        this.commandHistory.push(command);
+        if (this.commandHistory.length > 10) {
+            this.commandHistory.shift();
+        }
+        localStorage.setItem(this.commandHistoryStorageKey, JSON.stringify(this.commandHistory));
+        this.historyIndex = -1;
+    }
+    navigateHistory(direction) {
+        if (!this.commandHistory.length) return;
+
+        if (direction === -1) {
+            if (this.historyIndex === -1) {
+                this.historyIndex = this.commandHistory.length - 1;
+            } else if (this.historyIndex > 0) {
+                this.historyIndex--;
+            } else {
+                return;
+            }
+        } else {
+            if (this.historyIndex === -1) return;
+            if (this.historyIndex < this.commandHistory.length - 1) {
+                this.historyIndex++;
+            } else {
+                this.inputEl.value = '';
+                this.historyIndex = -1;
+                return;
+            }
+        }
+
+        this.inputEl.value = this.commandHistory[this.historyIndex];
+        this.inputEl.selectionStart = this.inputEl.selectionEnd = this.inputEl.value.length;
+    }
+
     bindEvents() {
+        this.inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.navigateHistory(-1);
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                this.navigateHistory(1);
+            }
+        });
         this.inputEl.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') this.handleEnterAction(e);
         });
@@ -391,6 +452,8 @@ class GameInterface {
 
         const command = this.inputEl.value.trim();
         if (!command) return;
+
+        this.addToHistory(command);
 
         this.inputEl.value = '';
 
