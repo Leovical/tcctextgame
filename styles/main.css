@@ -1185,3 +1185,15 @@ body {
         padding: 2px 6px;
     }
 }
+
+.unseen-object {
+    color: #00ff88;
+}
+
+.seen-object {
+    color: #dc3545;
+}
+
+.changed-object {
+    color: #ffc107;
+}

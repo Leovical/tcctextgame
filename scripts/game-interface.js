@@ -742,9 +742,9 @@ class GameInterface {
                 conteudo: `
                 <p><strong>Cores dos objetos (ao usar OLHAR):</strong></p>
                 <ul style="list-style:none; padding-left:0;">
-                    <li><span style="color: #0f0;">Verde</span> - objeto ainda não examinado.</li>
-                    <li><span style="color: #f00;">Vermelho</span> - objeto já examinado.</li>
-                    <li><span style="color: #ff0;">Amarelo</span> - objeto examinado, mas sua descrição mudou desde a última vez.</li>
+                    <li><span style="color: #00ff88;">Verde</span> - objeto ainda não examinado.</li>
+                    <li><span style="color: #dc3545;">Vermelho</span> - objeto já examinado.</li>
+                    <li><span style="color: #ffc107;">Amarelo</span> - objeto examinado, mas sua descrição mudou desde a última vez.</li>
                 </ul>
             `
             },
