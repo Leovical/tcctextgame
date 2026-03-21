@@ -105,7 +105,9 @@ class GameInterface {
     updateFocusIndicator() {
         if (!this.focusIndicator) return;
         const focusObj = api.state?.current_focus;
-        const focusText = focusObj ? String(focusObj).toUpperCase() : 'NENHUM';
+        const focusText = (focusObj && focusObj.toLowerCase() !== 'none')
+            ? String(focusObj).toUpperCase()
+            : 'NENHUM';
         this.focusIndicator.textContent = `FOCO: ${focusText}`;
     }
 
