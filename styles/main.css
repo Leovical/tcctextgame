@@ -328,7 +328,6 @@ body {
     font-size: 1.3rem;
     flex-grow: 1;
     outline: none;
-    text-shadow: 0 0 3px var(--phosphor-glow);
     caret-color: var(--phosphor-main);
     padding: 5px 10px;
     height: 100%;
