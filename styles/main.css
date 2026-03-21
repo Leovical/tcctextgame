@@ -267,7 +267,6 @@ body {
     padding: 30px;
     overflow-y: auto;
     color: var(--phosphor-main);
-    text-shadow: 0 0 4px var(--phosphor-glow);
     z-index: 20;
     font-family: 'VT323', monospace;
     font-size: 1.4rem;
