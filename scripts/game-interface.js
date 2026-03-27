@@ -18,6 +18,14 @@ class GameInterface {
         this.audioLoop = document.getElementById('music-loop');
         this.sfxPower = document.getElementById('sfx-power');
 
+        this.volumeKnob = document.getElementById('hw-volume-knob');
+        this.volumeSlider = document.getElementById('hw-volume-slider');
+        this.volumeHud = document.getElementById('volume-hud');
+        this.knobIndicator = this.volumeKnob.querySelector('.knob-indicator');
+        this.hudTimeout = null;
+        this.currentVolume = typeof getGameVolume === 'function' ? getGameVolume() : 0.3;
+        this.updateVolume(0);
+
         this.narrativeStarted = false;
         this.messageQueue = [];
         this.isTyping = false;
@@ -46,7 +54,12 @@ class GameInterface {
 
     onPowerOn() {
         this.inputEl.disabled = false;
-        this.maybeStartNarrative();
+
+        if (typeof setGameVolume === 'function') {
+            setGameVolume(this.currentVolume);
+    }
+
+    this.maybeStartNarrative();
     }
 
     onPowerOff() {
@@ -77,6 +90,8 @@ class GameInterface {
             const dist = this.scrollContainer.scrollHeight - this.scrollContainer.scrollTop - this.scrollContainer.clientHeight;
             this.autoScrollEnabled = dist < this.SCROLL_THRESHOLD;
         });
+
+        this.setupVolumeControl();
 
         const btnExit = document.getElementById('btn-exit-case');
         const btnExitMobile = document.getElementById('btn-voltar-mobile');
@@ -351,6 +366,72 @@ class GameInterface {
         this.isProgrammaticScroll = true;
         this.scrollContainer.scrollTop = this.scrollContainer.scrollHeight;
         requestAnimationFrame(() => { this.isProgrammaticScroll = false; });
+    }
+
+    setupVolumeControl() {
+        let isDragging = false;
+        let startX = 0;
+
+        const startDrag = (e) => {
+            e.preventDefault();
+            isDragging = true;
+            startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            document.body.style.cursor = 'pointer'; 
+        };
+
+        const doDrag = (e) => {
+            if (!isDragging) return;
+            const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const deltaX = currentX - startX;
+            
+            const sensitivity = 200; 
+            this.updateVolume(deltaX / sensitivity);
+            
+            startX = currentX;
+        };
+
+        const stopDrag = () => {
+            isDragging = false;
+            document.body.style.cursor = 'default'; 
+        };
+
+        this.volumeKnob.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', doDrag);
+        window.addEventListener('mouseup', stopDrag);
+
+        this.volumeKnob.addEventListener('touchstart', startDrag);
+        window.addEventListener('touchmove', doDrag);
+        window.addEventListener('touchend', stopDrag);
+    }
+
+    updateVolume(delta) {
+        this.currentVolume = Math.min(1, Math.max(0, this.currentVolume + delta));
+
+        if (this.currentVolume < 0.02) this.currentVolume = 0;
+
+        if (typeof setGameVolume === 'function') {
+            setGameVolume(this.currentVolume);
+        }
+
+        const rotation = (this.currentVolume * 180) - 90;
+        if (this.knobIndicator) {
+            this.knobIndicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+        }
+
+        if (this.volumeSlider) this.volumeSlider.value = this.currentVolume;
+
+        this.showVolumeHUD();
+    }
+
+    showVolumeHUD() {
+        if (!this.volumeHud) return;
+
+        this.volumeHud.classList.remove('hidden');
+        
+        clearTimeout(this.hudTimeout);
+        this.hudTimeout = setTimeout(() => {
+            this.volumeHud.classList.add('hidden');
+        }, 2000); 
     }
 }
 
