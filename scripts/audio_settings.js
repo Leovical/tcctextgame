@@ -8,7 +8,11 @@ export function getGameVolume() {
 function setGameVolume(value) {
     localStorage.setItem(VOLUME_KEY, value);
     document.querySelectorAll("audio").forEach(a => {
-        a.volume = value;
+        if (a.id === "sfx-power") {
+            a.volume = 0.8; 
+        } else {
+            a.volume = value;
+        }
     });
 }
 document.addEventListener("DOMContentLoaded", () => {
@@ -20,7 +24,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const volume = getGameVolume();
 
     document.querySelectorAll("audio").forEach(a => {
-        a.volume = volume;
+        if (a.id === "sfx-power") {
+            a.volume = 0.8;
+        } else {
+            a.volume = currentVol;
+        }
     });
 
     if (!modal || !openBtn || !closeBtn || !slider) {
@@ -33,11 +41,16 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.classList.remove("hidden");
     });
 
-    closeBtn.addEventListener("click", () => {
-        modal.classList.add("hidden");
-    });
+        openBtn?.addEventListener("click", () => {
+            modal?.classList.remove("hidden");
+        });
 
-    slider.addEventListener("input", e => {
-        setGameVolume(parseFloat(e.target.value));
-    });
-});
+        closeBtn?.addEventListener("click", () => {
+            modal?.classList.add("hidden");
+        });
+
+        slider.addEventListener("input", e => {
+            setGameVolume(parseFloat(e.target.value));
+        });
+    }
+);

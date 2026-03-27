@@ -355,6 +355,8 @@ class GameInterface {
             this.autoScrollEnabled = dist < this.SCROLL_THRESHOLD;
         });
 
+        this.setupVolumeControl();
+
         const btnExit = document.getElementById('btn-exit-case');
         const btnExitMobile = document.getElementById('btn-voltar-mobile');
 
@@ -928,6 +930,72 @@ class GameInterface {
             const modal = document.getElementById(id);
             if (modal) modal.classList.remove('open');
         });
+    }
+
+    setupVolumeControl() {
+        let isDragging = false;
+        let startX = 0;
+
+        const startDrag = (e) => {
+            e.preventDefault();
+            isDragging = true;
+            startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            document.body.style.cursor = 'pointer'; 
+        };
+
+        const doDrag = (e) => {
+            if (!isDragging) return;
+            const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const deltaX = currentX - startX;
+            
+            const sensitivity = 200; 
+            this.updateVolume(deltaX / sensitivity);
+            
+            startX = currentX;
+        };
+
+        const stopDrag = () => {
+            isDragging = false;
+            document.body.style.cursor = 'default'; 
+        };
+
+        this.volumeKnob.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', doDrag);
+        window.addEventListener('mouseup', stopDrag);
+
+        this.volumeKnob.addEventListener('touchstart', startDrag);
+        window.addEventListener('touchmove', doDrag);
+        window.addEventListener('touchend', stopDrag);
+    }
+
+    updateVolume(delta) {
+        this.currentVolume = Math.min(1, Math.max(0, this.currentVolume + delta));
+
+        if (this.currentVolume < 0.02) this.currentVolume = 0;
+
+        if (typeof setGameVolume === 'function') {
+            setGameVolume(this.currentVolume);
+        }
+
+        const rotation = (this.currentVolume * 180) - 90;
+        if (this.knobIndicator) {
+            this.knobIndicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+        }
+
+        if (this.volumeSlider) this.volumeSlider.value = this.currentVolume;
+
+        this.showVolumeHUD();
+    }
+
+    showVolumeHUD() {
+        if (!this.volumeHud) return;
+
+        this.volumeHud.classList.remove('hidden');
+        
+        clearTimeout(this.hudTimeout);
+        this.hudTimeout = setTimeout(() => {
+            this.volumeHud.classList.add('hidden');
+        }, 2000); 
     }
 }
 
