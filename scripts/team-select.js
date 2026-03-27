@@ -1,20 +1,32 @@
 import { api } from './api.js';
 import { API_URL } from './config.js';
 import { PowerManager } from './power-manager.js';
+import { setGameVolume, getGameVolume } from './audio_settings.js';
 
 class TeamSelectInterface {
     constructor() {
+
         this.powerBtnContainer = document.getElementById('power-btn-container');
         this.powerLed = document.getElementById('power-led');
         this.mobilePowerBtn = document.getElementById('mobile-power-btn');
         this.screenArea = document.getElementById('game-screen-area');
         this.audioLoop = document.getElementById('music-loop');
         this.caseListContainer = document.getElementById('case-list');
-        this.ws = null;
+        this.sfxPower = document.getElementById('sfx-power');
+
+        this.volumeKnob = document.getElementById('hw-volume-knob');
+        this.volumeSlider = document.getElementById('hw-volume-slider');
+        this.volumeHud = document.getElementById('volume-hud');
+        this.knobIndicator = this.volumeKnob?.querySelector('.knob-indicator');
+        this.currentVolume = getGameVolume();
+        this.hudTimeout = null;
+        this.setupVolumeControl();
 
         this.teamCode = sessionStorage.getItem('team_code');
         this.myMatricula = sessionStorage.getItem('my_matricula');
         this.members = JSON.parse(sessionStorage.getItem('team_members') || '[]');
+        this.ws = null;
+        this.cases = [];
 
         if (!this.teamCode || !this.myMatricula || !this.members.length) {
             alert('Dados do torneio não encontrados. Volte ao início.');
@@ -38,14 +50,88 @@ class TeamSelectInterface {
             mobilePowerBtn: this.mobilePowerBtn,
             screenArea: this.screenArea,
             audioLoop: this.audioLoop,
-            sfxPower: 'audio/startup_button.mp3',
-            onPowerOn: () => this.loadCases(),
-            onPowerOff: () => this.clearCases()
+            sfxPower: this.sfxPower,
+            onPowerOn: () => this.onPowerOn(),
+            onPowerOff: () => this.onPowerOff()
         });
 
         this.powerManager.init();
         this.bindEvents();
         this.connectWebSocket();
+    }
+
+    setupVolumeControl() {
+        if (!this.volumeKnob) return;
+
+        let isDragging = false;
+        let startX = 0;
+
+        const startDrag = (e) => {
+            e.preventDefault();
+            isDragging = true;
+            startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            document.body.style.cursor = 'pointer';
+        };
+
+        const doDrag = (e) => {
+            if (!isDragging) return;
+            const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const deltaX = currentX - startX;
+            const sensitivity = 200;
+            this.updateVolume(deltaX / sensitivity);
+            startX = currentX;
+        };
+
+        const stopDrag = () => {
+            isDragging = false;
+            document.body.style.cursor = 'default';
+        };
+
+        this.volumeKnob.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', doDrag);
+        window.addEventListener('mouseup', stopDrag);
+
+        this.volumeKnob.addEventListener('touchstart', startDrag);
+        window.addEventListener('touchmove', doDrag);
+        window.addEventListener('touchend', stopDrag);
+
+        if (this.volumeSlider) {
+            this.volumeSlider.value = this.currentVolume;
+            this.volumeSlider.addEventListener('input', (e) => {
+                this.updateVolume(parseFloat(e.target.value) - this.currentVolume);
+            });
+        }
+
+        const rotation = (this.currentVolume * 180) - 90;
+        if (this.knobIndicator) {
+            this.knobIndicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+        }
+    }
+
+    updateVolume(delta) {
+        this.currentVolume = Math.min(1, Math.max(0, this.currentVolume + delta));
+        if (this.currentVolume < 0.02) this.currentVolume = 0;
+
+        setGameVolume(this.currentVolume);
+
+        const rotation = (this.currentVolume * 180) - 90;
+        if (this.knobIndicator) {
+            this.knobIndicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+        }
+        if (this.volumeSlider) {
+            this.volumeSlider.value = this.currentVolume;
+        }
+
+        this.showVolumeHUD();
+    }
+
+    showVolumeHUD() {
+        if (!this.volumeHud) return;
+        this.volumeHud.classList.remove('hidden');
+        clearTimeout(this.hudTimeout);
+        this.hudTimeout = setTimeout(() => {
+            this.volumeHud.classList.add('hidden');
+        }, 2000);
     }
 
     bindEvents() {
@@ -98,6 +184,17 @@ class TeamSelectInterface {
             card.classList.remove('blocked');
             const statusSpan = card.querySelector('.card-meta span:first-child');
             if (statusSpan) statusSpan.textContent = 'DISPONÍVEL';
+        }
+    }
+
+    onPowerOn() {
+        setGameVolume(this.currentVolume);
+        this.loadCases();
+    }
+
+    onPowerOff() {
+        if (this.caseListContainer) {
+            this.caseListContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">SISTEMA DESLIGADO</p>';
         }
     }
 
@@ -169,34 +266,31 @@ class TeamSelectInterface {
             intermediario: 2,
             dificil: 3
         };
+        const stars = '★'.repeat(difficultyMap[c.difficulty] || 1) + '☆'.repeat(5 - (difficultyMap[c.difficulty] || 1));
 
         card.innerHTML = `
-    <div class="card-icon">
-        <img src="images/icon-folder.png" alt="Caso">
-    </div>
-    <div class="card-content">
-        <div class="card-row">
-            <div class="card-main-info">
-                <h2>${c.description}</h2>
-                <h3>${c.title}</h3>
+            <div class="card-icon">
+                <img src="images/icon-folder.png" alt="Caso">
             </div>
-            <div class="card-meta">
-                <span>${statusText}</span>
-                <span>DIF: ${'★'.repeat(difficultyMap[c.difficulty] || 1)}</span>
+            <div class="card-content">
+                <div class="card-row">
+                    <div class="card-main-info">
+                        <h2>${c.description}</h2>
+                        <h3>${c.title}</h3>
+                    </div>
+                    <div class="card-meta">
+                        <span>${statusText}</span>
+                        <span>DIF: ${stars}</span>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-`;
+        `;
 
         if (clickHandler) {
             card.addEventListener('click', clickHandler);
         }
 
         return card;
-    }
-
-    clearCases() {
-        this.caseListContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">SISTEMA DESLIGADO</p>';
     }
 
     selectCase(c) {
