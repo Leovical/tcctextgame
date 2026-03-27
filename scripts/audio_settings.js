@@ -5,52 +5,33 @@ export function getGameVolume() {
     return v !== null ? parseFloat(v) : 0.2;
 }
 
-function setGameVolume(value) {
-    localStorage.setItem(VOLUME_KEY, value);
-    document.querySelectorAll("audio").forEach(a => {
-        if (a.id === "sfx-power") {
-            a.volume = 0.8; 
+export function setGameVolume(value) {
+
+    const newVolume = Math.min(1, Math.max(0, value));
+    localStorage.setItem(VOLUME_KEY, newVolume);
+
+    document.querySelectorAll("audio").forEach(audio => {
+        if (audio.id === "sfx-power") {
+            audio.volume = 0.8;
         } else {
-            a.volume = value;
+            audio.volume = newVolume;
         }
     });
 }
+
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("settings-modal");
     const openBtn = document.querySelector(".settings-button");
     const closeBtn = document.getElementById("settings-close");
     const slider = document.getElementById("volume-slider");
 
-    const volume = getGameVolume();
+    if (!modal || !openBtn || !closeBtn || !slider) return;
 
-    document.querySelectorAll("audio").forEach(a => {
-        if (a.id === "sfx-power") {
-            a.volume = 0.8;
-        } else {
-            a.volume = currentVol;
-        }
-    });
+    const savedVolume = getGameVolume();
+    setGameVolume(savedVolume);
+    slider.value = savedVolume;
 
-    if (!modal || !openBtn || !closeBtn || !slider) {
-        return;
-    }
-
-    slider.value = volume;
-
-    openBtn.addEventListener("click", () => {
-        modal.classList.remove("hidden");
-    });
-
-        openBtn?.addEventListener("click", () => {
-            modal?.classList.remove("hidden");
-        });
-
-        closeBtn?.addEventListener("click", () => {
-            modal?.classList.add("hidden");
-        });
-
-        slider.addEventListener("input", e => {
-            setGameVolume(parseFloat(e.target.value));
-        });
-    }
-);
+    openBtn.addEventListener("click", () => modal.classList.remove("hidden"));
+    closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+    slider.addEventListener("input", (e) => setGameVolume(parseFloat(e.target.value)));
+});
