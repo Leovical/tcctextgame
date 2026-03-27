@@ -6,7 +6,7 @@ import { setGameVolume, getGameVolume } from './audio_settings.js';
 
 class GameInterface {
     constructor() {
-        
+
         this.powerBtnContainer = document.getElementById('power-btn-container');
         this.powerLed = document.getElementById('power-led');
         this.mobilePowerBtn = document.getElementById('mobile-power-btn');
@@ -784,18 +784,23 @@ class GameInterface {
     }
 
     insertControlButton(btn) {
-        const bottom = document.querySelector('.monitor-bottom');
-        if (bottom) {
-            bottom.insertBefore(btn, bottom.firstChild);
+        const controlsRight = document.querySelector('.monitor-controls-right');
+        if (controlsRight) {
+            controlsRight.prepend(btn);
         } else {
-            let controls = document.getElementById('game-controls');
-            if (!controls) {
-                controls = document.createElement('div');
-                controls.id = 'game-controls';
-                controls.className = 'game-controls';
-                document.querySelector('.game-interface')?.appendChild(controls) || document.body.appendChild(controls);
+            const bottom = document.querySelector('.monitor-bottom');
+            if (bottom) {
+                bottom.prepend(btn);
+            } else {
+                let controls = document.getElementById('game-controls');
+                if (!controls) {
+                    controls = document.createElement('div');
+                    controls.id = 'game-controls';
+                    controls.className = 'game-controls';
+                    document.querySelector('.game-interface')?.appendChild(controls) || document.body.appendChild(controls);
+                }
+                controls.appendChild(btn);
             }
-            controls.appendChild(btn);
         }
     }
 

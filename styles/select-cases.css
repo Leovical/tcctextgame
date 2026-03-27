@@ -77,7 +77,7 @@ body {
         var(--monitor-shadow-texture),
         0 20px 50px rgba(0, 0, 0, 0.5);
     z-index: 10;
-    user-select: none; 
+    user-select: none;
     -webkit-user-select: none;
 }
 
@@ -137,7 +137,7 @@ body {
     padding-right: 5%;
     box-sizing: border-box;
     gap: 15px;
-     justify-content: space-between !important;
+    justify-content: space-between !important;
     padding: 0 4%;
 }
 
@@ -259,37 +259,37 @@ body {
     border-radius: 50%;
     border: 2px solid #555;
     position: relative;
-    
-    cursor: pointer; 
-    
-    box-shadow: 
-        0 2px 4px rgba(0,0,0,0.3),
-        inset 0 1px 1px rgba(255,255,255,0.5);
+
+    cursor: pointer;
+
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 1px 1px rgba(255, 255, 255, 0.5);
 }
 
 .knob-indicator {
     position: absolute;
-    top: 2px; 
+    top: 2px;
     left: 50%;
-    width: 8px; 
+    width: 8px;
     height: 1.8vh;
-    background: #444; 
+    background: #444;
     border: 1px solid #333;
     border-radius: 2px;
-    box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5);
-    transform-origin: center bottom; 
-    transform: translateX(-50%); 
+    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.5);
+    transform-origin: center bottom;
+    transform: translateX(-50%);
     transition: transform 0.1s ease;
 }
 
 .volume-hud {
     position: absolute;
-    bottom: calc(4rem + 20px); 
+    bottom: calc(4rem + 20px);
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 20, 0, 0.95); 
+    background: rgba(0, 20, 0, 0.95);
     border: 1px solid var(--phosphor-main);
-    box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); 
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
     padding: 10px 15px;
     z-index: 100;
     display: flex;
@@ -745,4 +745,29 @@ body {
 .member-select option {
     background: #000;
     color: var(--phosphor-main);
+}
+
+.player-info {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    left: auto;
+    bottom: auto;
+    color: var(--phosphor-main);
+    font-family: 'VT323', monospace;
+    font-size: 0.9rem;
+    text-shadow: 0 0 4px var(--phosphor-glow);
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 4px 12px;
+    border: 1px solid var(--phosphor-main);
+    border-radius: 4px;
+    letter-spacing: 1px;
+    display: none;
+}
+
+@media screen and (max-width: 1080px) {
+    .player-info {
+        display: none !important;
+    }
 }
