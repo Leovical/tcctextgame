@@ -19,6 +19,7 @@ class SelectionInterface {
         this.currentVolume = typeof getGameVolume === 'function' ? getGameVolume() : 0.3;
         this.updateVolume(0);
 
+
         this.setupVolumeControl();
 
         this.exitButtons = [
@@ -40,6 +41,11 @@ class SelectionInterface {
 
         this.powerManager.init();
         this.bindExitEvents();
+
+        this.powerManager.init();
+        this.bindExitEvents();
+    
+        this.initVisualButtons();
     }
 
     bindExitEvents() {
@@ -211,6 +217,34 @@ class SelectionInterface {
             this.volumeHud.classList.add('hidden');
         }, 2000); 
     }
+
+    insertControlButton(btn) {
+        const controlsRight = document.querySelector('.monitor-controls-right');
+        if (controlsRight) {
+            controlsRight.prepend(btn);
+        }
+    }
+
+    initVisualButtons() {
+        const dicasBtn = document.createElement('div');
+        dicasBtn.className = 'chat-toggle';
+        dicasBtn.style.opacity = "0.6";
+        dicasBtn.style.cursor = "default";
+        dicasBtn.title = "Sistema de ajuda indisponível nesta tela";
+        dicasBtn.innerHTML = '<div class="button"><i class="fa-solid fa-lightbulb"></i></div>';
+
+        const anotacoesBtn = document.createElement('div');
+        anotacoesBtn.className = 'chat-toggle';
+        anotacoesBtn.style.opacity = "0.6";
+        anotacoesBtn.style.cursor = "default";
+        anotacoesBtn.title = "Bloco de notas indisponível nesta tela";
+        anotacoesBtn.innerHTML = '<div class="button"><i class="fa-solid fa-pen-to-square"></i></div>';
+
+        this.insertControlButton(dicasBtn);
+        this.insertControlButton(anotacoesBtn);
+        
+    }
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {

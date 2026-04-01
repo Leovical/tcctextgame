@@ -766,8 +766,51 @@ body {
     display: none;
 }
 
+.chat-toggle {
+    width: 4vh;
+    height: 4vh;
+    background: linear-gradient(to bottom, var(--monitor-shadow-dark), var(--monitor-shadow-light));
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.chat-toggle .button {
+    width: 2.5vh;
+    height: 2.5vh;
+    border: 2px solid #555;
+    border-radius: 50%;
+    background: #cac1b2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s;
+    position: relative;
+}
+
+.chat-toggle .button i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.8vh;
+    color: #555;
+    line-height: 1;
+}
+
+.chat-toggle:active .button {
+    background: var(--monitor-shadow-medium);
+    transform: scale(0.95);
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+
 @media screen and (max-width: 1080px) {
-    .player-info {
+    .player-info, .chat-toggle {
         display: none !important;
     }
 }
