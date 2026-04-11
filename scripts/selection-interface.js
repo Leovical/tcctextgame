@@ -42,9 +42,6 @@ class SelectionInterface {
         this.powerManager.init();
         this.bindExitEvents();
 
-        this.powerManager.init();
-        this.bindExitEvents();
-    
         this.initVisualButtons();
     }
 
@@ -160,23 +157,23 @@ class SelectionInterface {
             e.preventDefault();
             isDragging = true;
             startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-            document.body.style.cursor = 'pointer'; 
+            document.body.style.cursor = 'pointer';
         };
 
         const doDrag = (e) => {
             if (!isDragging) return;
             const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
             const deltaX = currentX - startX;
-            
-            const sensitivity = 200; 
+
+            const sensitivity = 200;
             this.updateVolume(deltaX / sensitivity);
-            
+
             startX = currentX;
         };
 
         const stopDrag = () => {
             isDragging = false;
-            document.body.style.cursor = 'default'; 
+            document.body.style.cursor = 'default';
         };
 
         this.volumeKnob.addEventListener('mousedown', startDrag);
@@ -211,11 +208,11 @@ class SelectionInterface {
         if (!this.volumeHud) return;
 
         this.volumeHud.classList.remove('hidden');
-        
+
         clearTimeout(this.hudTimeout);
         this.hudTimeout = setTimeout(() => {
             this.volumeHud.classList.add('hidden');
-        }, 2000); 
+        }, 2000);
     }
 
     insertControlButton(btn) {
@@ -242,7 +239,7 @@ class SelectionInterface {
 
         this.insertControlButton(dicasBtn);
         this.insertControlButton(anotacoesBtn);
-        
+
     }
 
 }
