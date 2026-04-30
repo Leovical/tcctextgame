@@ -86,6 +86,10 @@ class ApiService {
         return res.data;
     }
 
+    async getCaseById(id) {
+        return await this.request(`/cases/${id}`, "GET");
+    }
+
     async validateTeam(code) {
         console.log('validateTeam chamado com código:', code);
         const url = `/game/team/validate?code=${code}`;
@@ -93,6 +97,41 @@ class ApiService {
         const result = await this.request(url, "GET");
         console.log('Resultado da validação:', result);
         return result;
+    }
+
+    async getCoopDecks() {
+        return await this.request("/coop/decks", "GET");
+    }
+
+    async createPracticeRoom(deckId) {
+        return await this.request("/practice/room/create", "POST", { deck_id: deckId });
+    }
+
+    async checkPracticeRoom(code) {
+        return await this.request(`/practice/room/check?code=${code}`, "GET");
+    }
+
+    async initializePracticeCase(caseId, teamCode, nickname) {
+        return await this.request("/cases/initialize", "POST", {
+            case_id: caseId,
+            team_code: teamCode,
+            matricula: nickname,
+            practice: true
+        });
+    }
+
+    async executePracticeSQL(caseId, sql, teamCode, nickname) {
+        return await this.request("/game/execute", "POST", {
+            case_id: caseId,
+            sql: sql,
+            team_code: teamCode,
+            matricula: nickname,
+            practice: true
+        });
+    }
+
+    async getPracticeRoomStatus(code) {
+        return await this.request(`/practice/room/status?code=${code}`, "GET");
     }
 }
 

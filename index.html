@@ -71,6 +71,56 @@
         </div>
     </div>
 
+    <div id="play-mode-modal" class="settings-modal hidden">
+        <div class="settings-window">
+            <h3>MODO DE JOGO</h3>
+            <div class="team-modal-buttons">
+                <button id="play-solo" class="team-modal-btn">SINGLE PLAYER</button>
+                <button id="play-coop" class="team-modal-btn">COOPERATIVO</button>
+            </div>
+            <button id="play-mode-cancel" class="team-modal-btn">CANCELAR</button>
+        </div>
+    </div>
+
+    <div id="nickname-modal" class="settings-modal hidden">
+        <div class="settings-window">
+            <h3>ESCOLHA UM APELIDO</h3>
+            <input type="text" id="nickname-input" placeholder="Apelido" maxlength="20">
+            <div class="team-modal-buttons center">
+                <button id="nickname-confirm" class="team-modal-btn">CONFIRMAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="coop-action-modal" class="settings-modal hidden">
+        <div class="settings-window">
+            <h3>COOPERATIVO</h3>
+            <div class="team-modal-buttons">
+                <button id="create-room-btn" class="team-modal-btn">CRIAR SALA</button>
+                <button id="join-room-btn" class="team-modal-btn">ENTRAR EM SALA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deck-modal" class="settings-modal hidden">
+        <div class="settings-window">
+            <h3>ESCOLHA O DECK</h3>
+            <div id="deck-list" class="member-list"></div>
+            <button id="deck-confirm" class="team-modal-btn" disabled>SELECIONAR DECK</button>
+            <p id="deck-error" class="team-modal-error"></p>
+        </div>
+    </div>
+
+    <div id="join-room-modal" class="settings-modal hidden">
+        <div class="settings-window">
+            <h3>ENTRAR EM SALA</h3>
+            <input type="text" id="room-code-input" placeholder="Código da sala">
+            <button id="join-room-confirm" class="team-modal-btn">ENTRAR</button>
+            <p id="join-room-error" class="team-modal-error"></p>
+        </div>
+    </div>
+
+    <script type="module" src="scripts/coop-flow.js"></script>
     <script type="module" src="scripts/team-login-modal.js"></script>
     <script type="module" src="scripts/audio_settings.js"></script>
     <audio id="intro-music" src="audio/intro_theme.mp3" loop autoplay></audio>

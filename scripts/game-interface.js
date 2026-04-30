@@ -15,6 +15,7 @@ class GameInterface {
         this.submitBtn = document.getElementById('submit-btn');
         this.audioLoop = document.getElementById('music-loop');
         this.sfxPower = document.getElementById('sfx-power');
+        this.isPractice = urlParams.get('practice') === 'true';
 
         const urlParams = new URLSearchParams(window.location.search);
         this.caseId = urlParams.get('id');
@@ -39,7 +40,7 @@ class GameInterface {
             return;
         }
 
-        if (this.isTournament) {
+        if (this.isTournament || this.isPractice) {
             const members = JSON.parse(sessionStorage.getItem('team_members') || '[]');
             this.members = members;
             const member = members.find(m => m.matricula === this.matricula);
@@ -258,8 +259,10 @@ class GameInterface {
 
     async onPowerOn() {
         this.inputEl.disabled = false;
-        if (api.state && this.isTournament) {
-            const statusRes = await api.tournamentStatus(this.teamCode);
+        if (api.state && (this.isTournament || this.isPractice)) {
+            const statusRes = this.isPractice
+                ? await api.getPracticeRoomStatus(this.teamCode)
+                : await api.tournamentStatus(this.teamCode);
             this.teamReady = statusRes.data.ready;
         }
         this.maybeStartNarrative();
@@ -366,6 +369,8 @@ class GameInterface {
                     matricula: this.matricula
                 }).catch(() => { });
                 window.location.href = 'team-select-case.html';
+            } else if (this.isPractice) {
+                window.location.href = `practice-room.html?room=${this.teamCode}&nickname=${encodeURIComponent(this.matricula)}`;
             } else {
                 window.location.href = 'select-cases.html';
             }
@@ -378,8 +383,8 @@ class GameInterface {
     async preloadGameData() {
         let res;
 
-        if (this.isTournament) {
-            res = await api.initializeTournamentCase(this.caseId, this.teamCode, this.matricula);
+        if (this.isTournament || this.isPractice) {
+            res = await api.initializePracticeCase(this.caseId, this.teamCode, this.matricula);
         } else {
             res = await api.initializeGame(this.caseId);
         }
@@ -433,7 +438,7 @@ class GameInterface {
         if (!this.powerManager.isPoweredOn) return;
         if (!api.state) return;
         if (this.narrativeStarted) return;
-        if (this.isTournament && !this.teamReady) {
+        if ((this.isTournament || this.isPractice) && !this.teamReady) {
             this.queueMessage("\nAguardando seu time se conectar. Digite CLS quando todos estiverem prontos.", 'system');
             return;
         }
@@ -521,6 +526,8 @@ class GameInterface {
         let res;
         if (this.isTournament) {
             res = await api.executeTournamentSQL(this.caseId, command, this.teamCode, this.matricula);
+        } else if (this.isPractice) {
+            res = await api.executePracticeSQL(this.caseId, command, this.teamCode, this.matricula);
         } else {
             res = await api.executeSQL(this.caseId, command);
         }
@@ -855,7 +862,7 @@ class GameInterface {
     }
 
     initAnotacoes() {
-        if (this.isTournament) return;
+        if (this.isTournament || this.isPractice) return;
         if (document.getElementById('anotacoes-btn')) return;
 
         const anotacoesBtn = document.createElement('div');

@@ -156,7 +156,7 @@ body {
 }
 
 .settings-window {
-    width: 360px;
+    width: 420px;
     max-width: 85svw;
     padding: 28px 30px;
     border: 2px solid #33FF33;
@@ -167,7 +167,7 @@ body {
 
 .settings-window h3 {
     font-size: 1.2rem;
-    margin-bottom: 25px;
+    margin-bottom: 1.5rem;
     letter-spacing: 0.2em;
 }
 
@@ -292,7 +292,8 @@ body {
 .team-modal-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 1rem;
+    margin-bottom: 1rem;
     margin-top: 20px;
 }
 
@@ -300,10 +301,10 @@ body {
     background: transparent;
     border: 1px solid #33FF33;
     color: #33FF33;
-    padding: 10px 0;
+    padding: 0.5rem 0.5rem;
     cursor: pointer;
     font-family: 'The Led Display', monospace;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     transition: all 0.3s ease;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -394,4 +395,38 @@ body {
 #member-modal-error {
     font-size: 0.5rem;
     margin-top: 1rem;
+}
+
+#nickname-input,
+#room-code-input {
+    background: #000;
+    border: 1px solid #33FF33;
+    color: #33FF33;
+    padding: 10px;
+    font-family: 'VT323', monospace;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+}
+
+#nickname-input:focus,
+#room-code-input:focus {
+    box-shadow: 0 0 8px #33FF33;
+}
+
+.team-modal-error {
+    color: #ff3333;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    display: none;
+    text-align: center;
+    font-family: 'VT323', monospace;
+}
+
+.team-modal-buttons.center {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
 }
