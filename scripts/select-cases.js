@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://casosdecodigo-5l0x.onrender.com/api";
+const API_BASE_URL = "https://casosdecodigo-9c0g.onrender.com/api";
 
 const POWER_KEY = "monitor_power";
 
@@ -126,16 +126,16 @@ class SelectionInterface {
     }
 
     exitSystem() {
-    if (this.screenArea) {
-        this.screenArea.classList.add('screen-shutting-down');
-        
-        setTimeout(() => {
+        if (this.screenArea) {
+            this.screenArea.classList.add('screen-shutting-down');
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 500);
+        } else {
             window.location.href = 'index.html';
-        }, 500);
-    } else {
-        window.location.href = 'index.html';
+        }
     }
-}
 
     turnOn() {
         if (this.isPoweredOn) return;

@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://casosdecodigo-5l0x.onrender.com/api";
+const API_BASE_URL = "https://casosdecodigo-9c0g.onrender.com/api";
 
 document.addEventListener('DOMContentLoaded', () => {
     
