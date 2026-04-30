@@ -82,7 +82,9 @@ class PracticeRoom {
             const cases = [];
             for (const id of caseIDs) {
                 const caseRes = await api.getCaseById(id);
-                if (caseRes.ok) cases.push(caseRes.data);
+                if (caseRes.ok && caseRes.data.case) {
+                    cases.push(caseRes.data.case);
+                }
             }
             this.cases = cases;
 
@@ -90,6 +92,14 @@ class PracticeRoom {
             let occupiedCases = [];
             if (progressRes.ok && Array.isArray(progressRes.data)) {
                 occupiedCases = progressRes.data.filter(p => p.active).map(p => p.case_id);
+            }
+
+            const myActiveProg = progressRes.ok && Array.isArray(progressRes.data)
+                ? progressRes.data.find(p => p.active && p.matricula === this.nickname)
+                : null;
+            if (myActiveProg) {
+                window.location.href = `game.html?id=${myActiveProg.case_id}&team_code=${this.roomCode}&matricula=${encodeURIComponent(this.nickname)}&practice=true`;
+                return;
             }
 
             this.renderCases(occupiedCases);
@@ -114,33 +124,40 @@ class PracticeRoom {
         card.setAttribute('data-case-id', c.id);
         const statusText = isOccupied ? 'OCUPADO' : 'DISPONÍVEL';
 
+        const difficultyMap = {
+            iniciante: 1,
+            intermediario: 2,
+            dificil: 3
+        };
+        const diffKey = (c.difficulty || '').toLowerCase();
+        const stars = '★'.repeat(difficultyMap[diffKey] || 1) + '☆'.repeat(5 - (difficultyMap[diffKey] || 1));
+
         card.innerHTML = `
-            <div class="card-icon"><img src="images/icon-folder.png" alt="Caso"></div>
-            <div class="card-content">
-                <h2>${c.title}</h2>
+        <div class="card-icon"><img src="images/icon-folder.png" alt="Caso"></div>
+        <div class="card-content">
+            <div class="card-row">
+                <div class="card-main-info">
+                    <h2>${c.description}</h2>
+                    <h3>${c.title}</h3>
+                </div>
                 <div class="card-meta">
                     <span>${statusText}</span>
-                    <span>DIF: ${'★'.repeat(parseInt(c.difficulty) || 1)}</span>
+                    <span>DIF: ${stars}</span>
                 </div>
             </div>
-        `;
+        </div>
+    `;
 
         if (isOccupied) {
             card.addEventListener('click', () => alert('Este caso já está ocupado por outro jogador.'));
         } else {
             card.addEventListener('click', () => this.selectCase(c.id));
         }
-
         return card;
     }
 
     async selectCase(caseId) {
-        const res = await api.initializePracticeCase(caseId, this.roomCode, this.nickname);
-        if (res.ok) {
-            window.location.href = `game.html?id=${caseId}&team_code=${this.roomCode}&matricula=${encodeURIComponent(this.nickname)}&practice=true`;
-        } else {
-            alert(res.data.error || 'Não foi possível iniciar o caso.');
-        }
+        window.location.href = `game.html?id=${caseId}&team_code=${this.roomCode}&matricula=${encodeURIComponent(this.nickname)}&practice=true`;
     }
 
     clearCases() {

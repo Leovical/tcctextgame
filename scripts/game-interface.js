@@ -17,7 +17,6 @@ class GameInterface {
         this.submitBtn = document.getElementById('submit-btn');
         this.audioLoop = document.getElementById('music-loop');
         this.sfxPower = document.getElementById('sfx-power');
-        this.isPractice = urlParams.get('practice') === 'true';
 
         this.volumeKnob = document.getElementById('hw-volume-knob');
         this.volumeSlider = document.getElementById('hw-volume-slider');
@@ -31,7 +30,8 @@ class GameInterface {
         this.caseId = urlParams.get('id');
         this.teamCode = urlParams.get('team_code');
         this.matricula = urlParams.get('matricula');
-        this.isTournament = !!(this.teamCode && this.matricula);
+        this.isPractice = urlParams.get('practice') === 'true';
+        this.isTournament = !this.isPractice && !!(this.teamCode && this.matricula);
         this.teamReady = false;
 
         if (this.caseId) {
@@ -108,7 +108,7 @@ class GameInterface {
 
         this.setupVolumeControl();
 
-        if (this.isTournament) {
+        if (this.isTournament || this.isPractice) {
             this.notification = document.createElement('div');
             this.notification.className = 'game-notification';
             document.body.appendChild(this.notification);
@@ -283,8 +283,7 @@ class GameInterface {
     }
 
     sendChatMessage() {
-        if (!this.isTournament) return;
-        const msg = this.chatInput.value.trim();
+        if (!this.isTournament && !this.isPractice) return; const msg = this.chatInput.value.trim();
         if (!msg) return;
         if (msg.length > 500) {
             this.showMessage('Mensagem muito longa (máx 500 caracteres)');
@@ -450,15 +449,15 @@ class GameInterface {
         const btnExitMobile = document.getElementById('btn-voltar-mobile');
 
         const handleExit = async () => {
-            if (this.isTournament) {
+            if (this.isPractice) {
+                window.location.href = `practice-room.html?room=${this.teamCode}&nickname=${encodeURIComponent(this.matricula)}`;
+            } else if (this.isTournament) {
                 await api.request('/game/leave', 'POST', {
                     case_id: this.caseId,
                     team_code: this.teamCode,
                     matricula: this.matricula
                 }).catch(() => { });
                 window.location.href = 'team-select-case.html';
-            } else if (this.isPractice) {
-                window.location.href = `practice-room.html?room=${this.teamCode}&nickname=${encodeURIComponent(this.matricula)}`;
             } else {
                 window.location.href = 'select-cases.html';
             }
@@ -487,7 +486,14 @@ class GameInterface {
 
             this.updateHeaderTitle(window.gameCaseData.title);
 
-            if (this.isTournament) {
+            if (this.isPractice) {
+                const statusRes = await api.getPracticeRoomStatus(this.teamCode);
+                this.teamReady = statusRes.data.ready;
+                if (statusRes.ok && !statusRes.data.ready) {
+                    this.queueMessage("\nAguardando seu time se conectar. Digite CLS quando todos estiverem prontos.", 'system');
+                    return;
+                }
+            } else if (this.isTournament) {
                 const statusRes = await api.tournamentStatus(this.teamCode);
                 this.teamReady = statusRes.data.ready;
 
@@ -502,10 +508,16 @@ class GameInterface {
             }
         } else {
             if (res.status === 409) {
-                alert('Este caso não está disponível para sua matrícula. Você será redirecionado.');
-                window.location.href = 'team-select-case.html';
-            } else {
-                alert('Erro ao carregar o caso.');
+                if (this.isPractice) {
+                    alert('Este caso já foi escolhido por outro jogador. Retornando à sala.');
+                    window.location.href = `practice-room.html?room=${this.teamCode}&nickname=${encodeURIComponent(this.matricula)}`;
+                } else if (this.isTournament) {
+                    alert('Este caso não está disponível para sua matrícula. Você será redirecionado.');
+                    window.location.href = 'team-select-case.html';
+                } else {
+                    alert('Erro ao carregar o caso.');
+                }
+                return;
             }
         }
     }
@@ -584,10 +596,21 @@ class GameInterface {
             this.isSkipping = false;
             this.inputEl.disabled = false;
 
-            if (this.isTournament) {
+            if (this.isPractice) {
+                const statusRes = await api.getPracticeRoomStatus(this.teamCode);
+                this.teamReady = statusRes.data.ready;
+                if (this.teamReady) {
+                    const puzzleNum = api.state?.current_puzzle;
+                    const puzzle = window.gameCaseData?.puzzles?.find(p => p.number === puzzleNum);
+                    if (puzzle) {
+                        this.queueMessage(puzzle.narrative, 'narrative', puzzle.image_key);
+                    }
+                } else {
+                    this.queueMessage("\nAguardando seu time se conectar. Digite CLS quando todos estiverem prontos.", 'system');
+                }
+            } else if (this.isTournament) {
                 const statusRes = await api.tournamentStatus(this.teamCode);
                 this.teamReady = statusRes.data.ready;
-
                 if (this.teamReady) {
                     const puzzleNum = api.state?.current_puzzle;
                     const puzzle = window.gameCaseData?.puzzles?.find(p => p.number === puzzleNum);
