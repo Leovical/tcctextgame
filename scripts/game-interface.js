@@ -2,9 +2,11 @@ import { api } from './api.js';
 import { PowerManager } from './power-manager.js';
 import { formatTableData } from './formatters.js';
 import { API_URL } from './config.js';
+import { setGameVolume, getGameVolume } from './audio_settings.js';
 
 class GameInterface {
     constructor() {
+
         this.powerBtnContainer = document.getElementById('power-btn-container');
         this.powerLed = document.getElementById('power-led');
         this.mobilePowerBtn = document.getElementById('mobile-power-btn');
@@ -16,6 +18,14 @@ class GameInterface {
         this.audioLoop = document.getElementById('music-loop');
         this.sfxPower = document.getElementById('sfx-power');
         this.isPractice = urlParams.get('practice') === 'true';
+
+        this.volumeKnob = document.getElementById('hw-volume-knob');
+        this.volumeSlider = document.getElementById('hw-volume-slider');
+        this.volumeHud = document.getElementById('volume-hud');
+        this.knobIndicator = this.volumeKnob?.querySelector('.knob-indicator');
+
+        this.currentVolume = getGameVolume();
+        this.hudTimeout = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         this.caseId = urlParams.get('id');
@@ -54,7 +64,8 @@ class GameInterface {
             this.chatOpen = false;
             this.initChat();
         } else {
-            document.getElementById('chat-toggle').remove();
+            const chatToggle = document.getElementById('chat-toggle');
+            if (chatToggle) chatToggle.remove();
         }
         this.initDicas();
         this.initAnotacoes();
@@ -74,7 +85,6 @@ class GameInterface {
         this.focusIndicator.id = 'focus-indicator';
         this.focusIndicator.className = 'focus-indicator';
         this.focusIndicator.textContent = 'FOCO: --';
-
         const gameInterfaceContainer = document.querySelector('.game-interface');
         if (gameInterfaceContainer) {
             gameInterfaceContainer.appendChild(this.focusIndicator);
@@ -96,11 +106,86 @@ class GameInterface {
         this.powerManager.init();
         this.bindEvents();
 
+        this.setupVolumeControl();
+
         if (this.isTournament) {
             this.notification = document.createElement('div');
             this.notification.className = 'game-notification';
             document.body.appendChild(this.notification);
         }
+    }
+
+    setupVolumeControl() {
+        if (!this.volumeKnob) return;
+
+        let isDragging = false;
+        let startX = 0;
+
+        const startDrag = (e) => {
+            e.preventDefault();
+            isDragging = true;
+            startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            document.body.style.cursor = 'pointer';
+        };
+
+        const doDrag = (e) => {
+            if (!isDragging) return;
+            const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const deltaX = currentX - startX;
+            const sensitivity = 200;
+            this.updateVolume(deltaX / sensitivity);
+            startX = currentX;
+        };
+
+        const stopDrag = () => {
+            isDragging = false;
+            document.body.style.cursor = 'default';
+        };
+
+        this.volumeKnob.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', doDrag);
+        window.addEventListener('mouseup', stopDrag);
+
+        this.volumeKnob.addEventListener('touchstart', startDrag);
+        window.addEventListener('touchmove', doDrag);
+        window.addEventListener('touchend', stopDrag);
+
+        const rotation = (this.currentVolume * 180) - 90;
+        if (this.knobIndicator) {
+            this.knobIndicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+        }
+        if (this.volumeSlider) {
+            this.volumeSlider.value = this.currentVolume;
+            this.volumeSlider.addEventListener('input', (e) => {
+                this.updateVolume(parseFloat(e.target.value) - this.currentVolume);
+            });
+        }
+    }
+
+    updateVolume(delta) {
+        this.currentVolume = Math.min(1, Math.max(0, this.currentVolume + delta));
+        if (this.currentVolume < 0.02) this.currentVolume = 0;
+
+        setGameVolume(this.currentVolume);
+
+        const rotation = (this.currentVolume * 180) - 90;
+        if (this.knobIndicator) {
+            this.knobIndicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+        }
+        if (this.volumeSlider) {
+            this.volumeSlider.value = this.currentVolume;
+        }
+
+        this.showVolumeHUD();
+    }
+
+    showVolumeHUD() {
+        if (!this.volumeHud) return;
+        this.volumeHud.classList.remove('hidden');
+        clearTimeout(this.hudTimeout);
+        this.hudTimeout = setTimeout(() => {
+            this.volumeHud.classList.add('hidden');
+        }, 2000);
     }
 
     updateFocusIndicator() {
@@ -265,6 +350,9 @@ class GameInterface {
                 : await api.tournamentStatus(this.teamCode);
             this.teamReady = statusRes.data.ready;
         }
+
+        setGameVolume(this.currentVolume);
+
         this.maybeStartNarrative();
     }
 
@@ -703,18 +791,23 @@ class GameInterface {
     }
 
     insertControlButton(btn) {
-        const bottom = document.querySelector('.monitor-bottom');
-        if (bottom) {
-            bottom.insertBefore(btn, bottom.firstChild);
+        const controlsRight = document.querySelector('.monitor-controls-right');
+        if (controlsRight) {
+            controlsRight.prepend(btn);
         } else {
-            let controls = document.getElementById('game-controls');
-            if (!controls) {
-                controls = document.createElement('div');
-                controls.id = 'game-controls';
-                controls.className = 'game-controls';
-                document.querySelector('.game-interface')?.appendChild(controls) || document.body.appendChild(controls);
+            const bottom = document.querySelector('.monitor-bottom');
+            if (bottom) {
+                bottom.prepend(btn);
+            } else {
+                let controls = document.getElementById('game-controls');
+                if (!controls) {
+                    controls = document.createElement('div');
+                    controls.id = 'game-controls';
+                    controls.className = 'game-controls';
+                    document.querySelector('.game-interface')?.appendChild(controls) || document.body.appendChild(controls);
+                }
+                controls.appendChild(btn);
             }
-            controls.appendChild(btn);
         }
     }
 
