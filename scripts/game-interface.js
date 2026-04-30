@@ -685,7 +685,7 @@ class GameInterface {
 
         if (imageKey) {
             const assetsBaseUrl = API_URL.replace('/api', '');
-            const imgHtml = `<div class="evidence-container"><img src="${assetsBaseUrl}/assets/${imageKey}" class="evidence-img"></div>`;
+            const imgHtml = `<img class="evidence-container" src="${assetsBaseUrl}/assets/${imageKey}">`;
             processedContent = content.includes('[[IMAGE]]')
                 ? content.replace('[[IMAGE]]', imgHtml)
                 : content + `<br>${imgHtml}`;
