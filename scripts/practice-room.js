@@ -78,6 +78,7 @@ class PracticeRoom {
             const roomRes = await api.checkPracticeRoom(this.roomCode);
             if (!roomRes.ok) throw new Error('Sala não encontrada');
             const caseIDs = roomRes.data.case_ids;
+            sessionStorage.setItem('room_case_ids', JSON.stringify(caseIDs));
 
             const cases = [];
             for (const id of caseIDs) {
@@ -92,12 +93,6 @@ class PracticeRoom {
             let occupiedCases = [];
             if (progressRes.ok && Array.isArray(progressRes.data)) {
                 occupiedCases = progressRes.data.filter(p => p.active).map(p => p.case_id);
-            }
-
-            const validateRes = await api.validateTeam(this.teamCode);
-            if (validateRes.ok && validateRes.data.valid) {
-                this.cases = validateRes.data.cases;
-                sessionStorage.setItem('room_case_ids', JSON.stringify(this.cases.map(c => c.id)));
             }
 
             const myActiveProg = progressRes.ok && Array.isArray(progressRes.data)
