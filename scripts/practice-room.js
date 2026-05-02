@@ -94,6 +94,12 @@ class PracticeRoom {
                 occupiedCases = progressRes.data.filter(p => p.active).map(p => p.case_id);
             }
 
+            const validateRes = await api.validateTeam(this.teamCode);
+            if (validateRes.ok && validateRes.data.valid) {
+                this.cases = validateRes.data.cases;
+                sessionStorage.setItem('room_case_ids', JSON.stringify(this.cases.map(c => c.id)));
+            }
+
             const myActiveProg = progressRes.ok && Array.isArray(progressRes.data)
                 ? progressRes.data.find(p => p.active && p.matricula === this.nickname)
                 : null;

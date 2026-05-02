@@ -33,6 +33,7 @@ class GameInterface {
         this.isPractice = urlParams.get('practice') === 'true';
         this.isTournament = !this.isPractice && !!(this.teamCode && this.matricula);
         this.teamReady = false;
+        this.playerMap = {};
 
         if (this.caseId) {
             const storageKey = `commandHistory_${this.caseId}_${this.matricula || 'single'}`;
@@ -486,6 +487,10 @@ class GameInterface {
 
             this.updateHeaderTitle(window.gameCaseData.title);
 
+            if (this.isTournament || this.isPractice) {
+                await this.loadPlayerMap();
+            }
+
             if (this.isPractice) {
                 const statusRes = await api.getPracticeRoomStatus(this.teamCode);
                 this.teamReady = statusRes.data.ready;
@@ -680,6 +685,40 @@ class GameInterface {
         }
     }
 
+    async loadPlayerMap() {
+        const orderRaw = sessionStorage.getItem('room_case_ids');
+        if (!orderRaw) return;
+        const order = JSON.parse(orderRaw);
+
+        const progressRes = await api.request(`/game/progress?team_code=${this.teamCode}`, 'GET');
+        if (!progressRes.ok || !Array.isArray(progressRes.data)) return;
+
+        const members = JSON.parse(sessionStorage.getItem('team_members') || '[]');
+
+        this.playerMap = {};
+        order.forEach((caseId, index) => {
+            const pos = String(index + 1);
+            const prog = progressRes.data.find(p => p.case_id === caseId && p.active);
+            if (prog) {
+                const mat = prog.matricula;
+                const member = members.find(m => m.matricula === mat);
+                const fullName = member ? member.nome : mat;
+                const firstName = fullName.split(' ')[0];
+                this.playerMap[pos] = firstName;
+            } else {
+                this.playerMap[pos] = `Jogador ${pos}`;
+            }
+        });
+    }
+
+    replacePlayerTags(text) {
+        if (!text || !this.playerMap || Object.keys(this.playerMap).length === 0) return text;
+        return text.replace(/<player(\d)>/gi, (match, num) => {
+            const name = this.playerMap[num] || `Jogador ${num}`;
+            return `<span class="player-name">${name}</span>`;
+        });
+    }
+
     queueMessage(content, type, imageKey = null) {
         let processedContent = content;
 
@@ -690,6 +729,8 @@ class GameInterface {
                 ? content.replace('[[IMAGE]]', imgHtml)
                 : content + `<br>${imgHtml}`;
         }
+
+        processedContent = this.replacePlayerTags(processedContent);
 
         this.messageQueue.push({ content: processedContent, type });
         requestAnimationFrame(() => this.processQueue());

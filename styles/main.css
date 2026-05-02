@@ -809,6 +809,11 @@ body {
     }
 }
 
+.player-name {
+    color: darkblue;
+    font-style: italic;
+}
+
 /* Scanlines */
 .evidence-container::after {
     content: "";
