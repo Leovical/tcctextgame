@@ -487,10 +487,6 @@ class GameInterface {
 
             this.updateHeaderTitle(window.gameCaseData.title);
 
-            if (this.isTournament || this.isPractice) {
-                await this.loadPlayerMap();
-            }
-
             if (this.isPractice) {
                 const statusRes = await api.getPracticeRoomStatus(this.teamCode);
                 this.teamReady = statusRes.data.ready;
@@ -501,11 +497,14 @@ class GameInterface {
             } else if (this.isTournament) {
                 const statusRes = await api.tournamentStatus(this.teamCode);
                 this.teamReady = statusRes.data.ready;
-
                 if (statusRes.ok && !statusRes.data.ready) {
                     this.queueMessage("\nAguardando seu time se conectar. Digite CLS quando todos estiverem prontos.", 'system');
                     return;
                 }
+            }
+
+            if (this.isTournament || this.isPractice) {
+                await this.loadPlayerMap();
             }
 
             if (this.powerManager.isPoweredOn) {
@@ -605,6 +604,7 @@ class GameInterface {
                 const statusRes = await api.getPracticeRoomStatus(this.teamCode);
                 this.teamReady = statusRes.data.ready;
                 if (this.teamReady) {
+                    await this.loadPlayerMap();
                     const puzzleNum = api.state?.current_puzzle;
                     const puzzle = window.gameCaseData?.puzzles?.find(p => p.number === puzzleNum);
                     if (puzzle) {
@@ -617,6 +617,7 @@ class GameInterface {
                 const statusRes = await api.tournamentStatus(this.teamCode);
                 this.teamReady = statusRes.data.ready;
                 if (this.teamReady) {
+                    await this.loadPlayerMap();
                     const puzzleNum = api.state?.current_puzzle;
                     const puzzle = window.gameCaseData?.puzzles?.find(p => p.number === puzzleNum);
                     if (puzzle) {
