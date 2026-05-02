@@ -804,6 +804,7 @@ body {
 
 @media (min-width: 768px) {
     .evidence-container {
+        max-height: 60vh;
         max-width: 75%;
     }
 }
