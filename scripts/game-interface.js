@@ -687,10 +687,24 @@ class GameInterface {
     }
 
     async loadPlayerMap() {
-        const orderRaw = sessionStorage.getItem('room_case_ids');
-        if (!orderRaw) return;
-        const order = JSON.parse(orderRaw);
+        let orderRaw = sessionStorage.getItem('room_case_ids');
 
+        if (!orderRaw) {
+            const tournamentCasesRaw = sessionStorage.getItem('tournament_cases');
+            if (tournamentCasesRaw) {
+                try {
+                    const tournamentCases = JSON.parse(tournamentCasesRaw);
+                    const ids = tournamentCases.map(c => c.id);
+                    orderRaw = JSON.stringify(ids);
+                } catch (e) {
+                    console.warn('Erro ao parsear tournament_cases', e);
+                }
+            }
+        }
+
+        if (!orderRaw) return;
+
+        const order = JSON.parse(orderRaw);
         const progressRes = await api.request(`/game/progress?team_code=${this.teamCode}`, 'GET');
         if (!progressRes.ok || !Array.isArray(progressRes.data)) return;
 
