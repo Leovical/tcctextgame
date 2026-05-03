@@ -69,7 +69,7 @@ class GameInterface {
             if (chatToggle) chatToggle.remove();
         }
         this.initDicas();
-        this.initAnotacoes();
+        this.initNotesPanel();
 
         this.narrativeStarted = false;
         this.messageQueue = [];
@@ -1019,45 +1019,30 @@ class GameInterface {
         });
     }
 
-    initAnotacoes() {
-        if (this.isTournament || this.isPractice) return;
-        if (document.getElementById('anotacoes-btn')) return;
+    initNotesPanel() {
 
-        const anotacoesBtn = document.createElement('div');
-        anotacoesBtn.id = 'anotacoes-btn';
-        anotacoesBtn.className = 'chat-toggle';
-        anotacoesBtn.innerHTML = '<div class="button"><i class="fa-solid fa-pen-to-square"></i></div>';
-        anotacoesBtn.title = 'Anotações';
+        const toggle = document.createElement('div');
+        toggle.id = 'notes-toggle';
+        toggle.innerHTML = '<i class="fa-solid fa-note-sticky"></i>';
+        toggle.title = 'Anotações';
+        document.body.appendChild(toggle);
 
-        const anotacoesModal = document.createElement('div');
-        anotacoesModal.id = 'anotacoes-modal';
-        anotacoesModal.className = 'chat-container';
-        anotacoesModal.style.width = '400px';
-        anotacoesModal.style.height = 'auto';
-        anotacoesModal.style.maxHeight = '80vh';
-        anotacoesModal.innerHTML = `
-    <div class="chat-header">
-        <i class="fa-regular fa-note-sticky"></i> Anotações
-        <span style="float:right; cursor:pointer;" class="close-modal">&times;</span>
-    </div>
-    <div class="chat-messages" style="flex-grow:1; overflow-y:auto; padding:10px;">
-        <textarea id="anotacoes-text" placeholder="Escreva suas observações aqui..." 
-            style="width:100%; background:#111; border:1px solid var(--phosphor-main); color:var(--phosphor-main); font-family:inherit; padding:8px; box-sizing:border-box; resize:none; white-space:pre-wrap; word-wrap:break-word;"></textarea>
-    </div>
-`;
-
-        this.insertControlButton(anotacoesBtn);
-        const gameInterface = document.querySelector('.game-interface');
-        if (gameInterface) {
-            gameInterface.appendChild(anotacoesModal);
-        } else {
-            document.body.appendChild(anotacoesModal);
-        }
+        const panel = document.createElement('div');
+        panel.id = 'notes-panel';
+        panel.innerHTML = `
+        <div class="notes-header" id="notes-drag-handle">
+            <span><i class="fa fa-pencil-square" aria-hidden="true"></i> Anotações</span>
+            <button id="notes-close" title="Fechar">&times;</button>
+        </div>
+        <textarea id="notes-textarea" placeholder="Escreva suas observações..."></textarea>
+    `;
+        panel.classList.add('hidden');
+        document.body.appendChild(panel);
 
         const storageKey = `notes_${this.caseId}`;
-        const textarea = anotacoesModal.querySelector('#anotacoes-text');
-        const saved = localStorage.getItem(storageKey);
-        if (saved) textarea.value = saved;
+        const textarea = panel.querySelector('#notes-textarea');
+
+        textarea.value = localStorage.getItem(storageKey) || '';
 
         textarea.addEventListener('input', () => {
             localStorage.setItem(storageKey, textarea.value);
@@ -1069,26 +1054,47 @@ class GameInterface {
             }
         });
 
-        anotacoesBtn.addEventListener('click', () => {
-            const isOpen = anotacoesModal.classList.contains('open');
-            this.closeAllModals();
-            if (!isOpen) {
-                anotacoesModal.classList.add('open');
-            }
+        panel.querySelector('#notes-close').addEventListener('click', () => {
+            panel.classList.add('hidden');
         });
 
-        const closeBtn = anotacoesModal.querySelector('.close-modal');
-        closeBtn.addEventListener('click', () => {
-            anotacoesModal.classList.remove('open');
+        toggle.addEventListener('click', () => {
+            panel.classList.toggle('hidden');
         });
 
-        anotacoesModal.addEventListener('click', (e) => {
-            if (e.target === anotacoesModal) anotacoesModal.classList.remove('open');
+        const dragHandle = panel.querySelector('#notes-drag-handle');
+        let isDragging = false;
+        let startX, startY, startLeft, startTop;
+
+        dragHandle.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = panel.getBoundingClientRect();
+            startLeft = rect.left;
+            startTop = rect.top;
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
         });
+
+        const onMouseMove = (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            panel.style.left = `${startLeft + dx}px`;
+            panel.style.top = `${startTop + dy}px`;
+        };
+
+        const onMouseUp = () => {
+            isDragging = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        };
     }
 
     closeAllModals() {
-        const modals = ['chat-container', 'dicas-modal', 'anotacoes-modal'];
+        const modals = ['chat-container', 'dicas-modal', 'notes-panel'];
         modals.forEach(id => {
             const modal = document.getElementById(id);
             if (modal) modal.classList.remove('open');
