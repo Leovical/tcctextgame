@@ -209,6 +209,8 @@ class TeamSelectInterface {
             }
             this.cases = validateRes.data.cases;
 
+            sessionStorage.setItem('room_case_ids', JSON.stringify(this.cases.map(c => c.id)));
+
             const progressRes = await api.request(`/game/progress?team_code=${this.teamCode}`, 'GET');
             let myCaseId = null;
             if (progressRes.ok && Array.isArray(progressRes.data)) {
