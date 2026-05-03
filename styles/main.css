@@ -56,7 +56,7 @@ body {
 
 .computer-container {
     --height-monitor: 90vh;
-    --width-monitor: calc(var(--height-monitor) * 1.25);
+    --width-monitor: calc(var(--height-monitor) * 1.45);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -641,7 +641,7 @@ body {
     }
 }
 
-@media screen and (max-width: 1080px) {
+@media screen and (max-width: 1250px) {
 
     .monitor-bottom {
         display: none !important;
@@ -802,10 +802,18 @@ body {
     animation: crt-glow 0.15s infinite;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1250px) {
     .evidence-container {
         max-height: 60vh;
         max-width: 75%;
+    }
+}
+
+
+@media (min-width: 768px) {
+    .evidence-container {
+        max-height: 70vh;
+        max-width: 80%;
     }
 }
 
@@ -1007,7 +1015,7 @@ body {
     box-shadow: 0 0 5px var(--phosphor-main);
 }
 
-@media screen and (max-width: 1080px) {
+@media screen and (max-width: 1250px) {
 
     .chat-container,
     .chat-toggle {
@@ -1231,7 +1239,7 @@ body {
     backdrop-filter: blur(2px);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1250px) {
     .focus-indicator {
         top: 10px;
         right: 10px;
@@ -1280,7 +1288,7 @@ body {
     display: none;
 }
 
-@media screen and (max-width: 1080px) {
+@media screen and (max-width: 1250px) {
     .player-info {
         display: none !important;
     }

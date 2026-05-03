@@ -124,7 +124,7 @@ body {
     filter: drop-shadow(0 0 10px #33FF33);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1250px) {
     .subtitle {
         font-size: 1rem;
     }
@@ -251,7 +251,7 @@ body {
     transform: translateY(-2px);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1250px) {
     .action-buttons {
         left: 20px;
         bottom: 20px;

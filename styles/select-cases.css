@@ -56,7 +56,7 @@ body {
 
 .computer-container {
     --height-monitor: 90vh;
-    --width-monitor: calc(var(--height-monitor) * 1.25);
+    --width-monitor: calc(var(--height-monitor) * 1.45);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -606,7 +606,7 @@ body {
     }
 }
 
-@media screen and (max-width: 1080px) {
+@media screen and (max-width: 1250px) {
     .monitor-bottom {
         display: none !important;
     }
@@ -809,8 +809,10 @@ body {
 }
 
 
-@media screen and (max-width: 1080px) {
-    .player-info, .chat-toggle {
+@media screen and (max-width: 1250px) {
+
+    .player-info,
+    .chat-toggle {
         display: none !important;
     }
 }
