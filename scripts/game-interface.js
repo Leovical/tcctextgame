@@ -64,6 +64,7 @@ class GameInterface {
             this.unreadCount = 0;
             this.chatOpen = false;
             this.initChat();
+            this.connectTeamWebSocket();
         } else {
             const chatToggle = document.getElementById('chat-toggle');
             if (chatToggle) chatToggle.remove();
@@ -269,6 +270,20 @@ class GameInterface {
         this.chatWs.onerror = (err) => {
             console.error('Chat WebSocket erro', err);
             this.showMessage('Erro na conexão do chat', 3000);
+        };
+    }
+
+    connectTeamWebSocket() {
+        const wsUrl = API_URL.replace('http', 'ws') + `/game/team/ws?team_code=${this.teamCode}`;
+        this.teamWs = new WebSocket(wsUrl);
+        this.teamWs.onmessage = async (event) => {
+            const data = JSON.parse(event.data);
+            if (data.case_id && data.status === 'occupied') {
+                setTimeout(() => this.loadPlayerMap(), 500);
+            }
+        };
+        this.teamWs.onclose = () => {
+            setTimeout(() => this.connectTeamWebSocket(), 5000);
         };
     }
 
