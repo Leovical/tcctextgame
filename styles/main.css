@@ -798,7 +798,7 @@ body {
     margin: 15px auto;
     overflow: hidden;
     box-sizing: border-box;
-    filter: contrast(1.2) sepia(0.2);
+    filter: brightness(0.7) contrast(1.2) sepia(0.2);
     animation: crt-glow 0.15s infinite;
 }
 
