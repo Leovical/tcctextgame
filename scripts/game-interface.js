@@ -739,6 +739,11 @@ class GameInterface {
                 this.playerMap[pos] = `Jogador ${pos}`;
             }
         });
+
+        const hasPlaceholder = Object.values(this.playerMap).some(name => name.startsWith('Jogador '));
+        if (hasPlaceholder && this.teamReady) {
+            setTimeout(() => this.loadPlayerMap(), 2000);
+        }
     }
 
     replacePlayerTags(text) {
