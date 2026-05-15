@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
 
 @font-face {
-    font-family: 'The Led Display';
-    src: url('../fonts/TheLedDisplay.ttf') format('truetype');
+    font-family: "The Led Display";
+    src: url("../fonts/TheLedDisplay.ttf") format("truetype");
 }
 
 :root {
@@ -12,12 +12,14 @@
     --monitor-shadow-medium: #b7b19b;
     --monitor-shadow-dark: #908e7a;
     --monitor-shadow-very-dark: #6e6d5f;
-    --monitor-gradient: linear-gradient(to bottom, var(--monitor-light-color), var(--monitor-dark-color));
+    --monitor-gradient: linear-gradient(
+        to bottom,
+        var(--monitor-light-color),
+        var(--monitor-dark-color)
+    );
     --monitor-shadow-texture:
-        2px -2px 30px #493e2a33 inset,
-        -2px -2px 30px #493e2a33 inset,
-        1px -1px 1px #493e2a33 inset,
-        -1px -1px 1px #493e2a33 inset,
+        2px -2px 30px #493e2a33 inset, -2px -2px 30px #493e2a33 inset,
+        1px -1px 1px #493e2a33 inset, -1px -1px 1px #493e2a33 inset,
         0 2px 30px #ddd inset;
     --screen-bg: #000;
     --phosphor-main: #00ff41;
@@ -43,7 +45,7 @@ body {
     justify-content: center;
     align-items: center;
     margin: 0;
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
 }
 
 .container {
@@ -83,7 +85,7 @@ body {
 
 .computer-container .monitor .monitor-inner {
     width: calc(var(--width-monitor) * 0.88);
-    height: calc(var(--height-monitor) * 0.80);
+    height: calc(var(--height-monitor) * 0.8);
     border-radius: 8px;
     display: flex;
     justify-content: center;
@@ -104,7 +106,9 @@ body {
     justify-content: center;
     align-items: center;
     border: 3px solid #000;
-    box-shadow: 10px 10px 20px 14px #0008 inset, -10px -10px 20px 14px #0008 inset;
+    box-shadow:
+        10px 10px 20px 14px #0008 inset,
+        -10px -10px 20px 14px #0008 inset;
     position: relative;
     overflow: hidden;
 }
@@ -151,7 +155,11 @@ body {
 .power-switch {
     width: 4vh;
     height: 4vh;
-    background: linear-gradient(to bottom, var(--monitor-shadow-dark), var(--monitor-shadow-light));
+    background: linear-gradient(
+        to bottom,
+        var(--monitor-shadow-dark),
+        var(--monitor-shadow-light)
+    );
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -221,7 +229,6 @@ body {
     transform: translateY(-0.4vh);
 }
 
-
 #mobile-power-btn {
     display: none;
 }
@@ -243,7 +250,9 @@ body {
 
 #power-led.on {
     background: #5cef11;
-    box-shadow: 0 0 10px #5cef11, inset 0 0 2px rgba(0, 0, 0, 0.2);
+    box-shadow:
+        0 0 10px #5cef11,
+        inset 0 0 2px rgba(0, 0, 0, 0.2);
     animation: none;
 }
 
@@ -256,7 +265,11 @@ body {
 .volume-knob {
     width: 4.5vh;
     height: 4.5vh;
-    background: linear-gradient(to bottom, var(--monitor-shadow-dark), var(--monitor-shadow-light));
+    background: linear-gradient(
+        to bottom,
+        var(--monitor-shadow-dark),
+        var(--monitor-shadow-light)
+    );
     border-radius: 50%;
     border: 2px solid #555;
     position: relative;
@@ -297,7 +310,9 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    transition: opacity 0.3s, visibility 0.3s;
+    transition:
+        opacity 0.3s,
+        visibility 0.3s;
     pointer-events: none;
 }
 
@@ -307,7 +322,7 @@ body {
 }
 
 .volume-hud label {
-    font-family: 'The Led Display', monospace;
+    font-family: "The Led Display", monospace;
     font-size: 0.8rem;
     color: var(--phosphor-main);
 }
@@ -335,7 +350,13 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3));
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0) 50%,
+        rgba(0, 0, 0, 0.2) 50%,
+        rgba(0, 0, 0, 0.3)
+    );
     background-size: 100% 4px;
     z-index: 50;
     pointer-events: none;
@@ -360,7 +381,7 @@ body {
     overflow-y: auto;
     color: var(--phosphor-main);
     z-index: 20;
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
     font-size: 1.4rem;
     line-height: 1.5;
     width: 100%;
@@ -373,7 +394,7 @@ body {
 }
 
 #case-title {
-    font-family: 'The Led Display', monospace;
+    font-family: "The Led Display", monospace;
     font-size: 2.5rem;
     text-align: center;
     border-bottom: 2px solid var(--phosphor-main);
@@ -410,14 +431,14 @@ body {
     font-weight: bold;
     font-size: 1rem;
     margin-right: 15px;
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
 }
 
 #command-input {
     background: rgba(0, 255, 65, 0.15);
     border: 1px solid rgba(0, 255, 65, 0.4);
     color: var(--phosphor-main);
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
     font-size: 1.3rem;
     flex-grow: 1;
     outline: none;
@@ -437,7 +458,7 @@ body {
     background: transparent;
     border: none;
     color: var(--phosphor-main);
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
     font-size: 1.8rem;
     cursor: pointer;
     margin-left: 10px;
@@ -520,7 +541,7 @@ body {
     }
 
     70% {
-        transform: scale(0.0, 0.005);
+        transform: scale(0, 0.005);
         opacity: 1;
         background: #fff;
         filter: brightness(5);
@@ -616,7 +637,7 @@ body {
 }
 
 .schema-hint {
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     font-size: 0.85rem;
     color: var(--phosphor-main);
     opacity: 0.6;
@@ -628,7 +649,6 @@ body {
 }
 
 @keyframes blink-standby {
-
     0%,
     100% {
         background-color: #330000;
@@ -642,7 +662,6 @@ body {
 }
 
 @media screen and (max-width: 1250px) {
-
     .monitor-bottom {
         display: none !important;
     }
@@ -734,7 +753,7 @@ body {
         background: var(--phosphor-main);
         color: #000;
         border: 2px solid var(--phosphor-glow);
-        font-family: 'VT323', monospace;
+        font-family: "VT323", monospace;
         font-size: 1.2rem;
         font-weight: bold;
         z-index: 9999;
@@ -762,7 +781,7 @@ body {
         border: none;
         padding: 10px 25px;
 
-        font-family: 'VT323', monospace;
+        font-family: "VT323", monospace;
         font-size: 0.9rem;
         font-weight: bold;
         text-transform: uppercase;
@@ -772,8 +791,7 @@ body {
             0 4px 0 rgba(0, 255, 65, 0.3),
             inset 0 -2px 0 var(--phosphor-glow);
 
-        clip-path: polygon(0 0, 100% 0,
-                95% 100%, 5% 100%);
+        clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
 
         cursor: pointer;
         transition: all 0.1s;
@@ -802,23 +820,15 @@ body {
     animation: crt-glow 0.15s infinite;
 }
 
-@media (min-width: 1250px) {
-    .evidence-container {
-        max-height: 60vh;
-        max-width: 75%;
-    }
-}
-
-
 @media (min-width: 768px) {
     .evidence-container {
-        max-height: 70vh;
+        max-height: 50vh;
         max-width: 80%;
     }
 }
 
 .player-name {
-    color: #B4C5E4;
+    color: #b4c5e4;
     font-style: italic;
 }
 
@@ -829,8 +839,15 @@ body {
     inset: 0;
     background:
         linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
-        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-    background-size: 100% 3px, 3px 100%;
+        linear-gradient(
+            90deg,
+            rgba(255, 0, 0, 0.03),
+            rgba(0, 255, 0, 0.01),
+            rgba(0, 0, 255, 0.03)
+        );
+    background-size:
+        100% 3px,
+        3px 100%;
     pointer-events: none;
     z-index: 2;
 }
@@ -853,7 +870,11 @@ body {
 .chat-toggle {
     width: 4vh;
     height: 4vh;
-    background: linear-gradient(to bottom, var(--monitor-shadow-dark), var(--monitor-shadow-light));
+    background: linear-gradient(
+        to bottom,
+        var(--monitor-shadow-dark),
+        var(--monitor-shadow-light)
+    );
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -896,7 +917,7 @@ body {
     background: #ff3333;
     color: white;
     font-size: 1.2vh;
-    font-family: 'Inter', monospace;
+    font-family: "Inter", monospace;
     width: 2vh;
     height: 2vh;
     border-radius: 50%;
@@ -924,7 +945,7 @@ body {
     display: none;
     flex-direction: column;
     z-index: 200;
-    font-family: 'PixeVT323llari', monospace;
+    font-family: "PixeVT323llari", monospace;
     color: var(--phosphor-main);
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
     transform: translateX(120%);
@@ -990,7 +1011,7 @@ body {
     color: var(--phosphor-main);
     padding: 8px;
     outline: none;
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
     font-size: 0.9rem;
 }
 
@@ -1005,7 +1026,7 @@ body {
     cursor: pointer;
     padding: 8px 12px;
     margin-left: 5px;
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
     font-weight: bold;
     transition: all 0.2s;
 }
@@ -1016,7 +1037,6 @@ body {
 }
 
 @media screen and (max-width: 1250px) {
-
     .chat-container,
     .chat-toggle {
         display: none !important;
@@ -1028,11 +1048,11 @@ body {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: #33FF33;
+    background: #33ff33;
     color: #000;
     padding: 10px 20px;
     border-radius: 5px;
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
     font-size: 1rem;
     z-index: 1000;
     opacity: 0;
@@ -1050,13 +1070,17 @@ body {
     font-size: 0.8rem;
     color: var(--phosphor-main);
     margin-top: 2px;
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
 }
 
 .game-switch {
     width: 4vh;
     height: 4vh;
-    background: linear-gradient(to bottom, var(--monitor-shadow-dark), var(--monitor-shadow-light));
+    background: linear-gradient(
+        to bottom,
+        var(--monitor-shadow-dark),
+        var(--monitor-shadow-light)
+    );
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -1097,7 +1121,7 @@ body {
     border: 2px solid var(--phosphor-main);
     border-radius: 5px;
     color: var(--phosphor-main);
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
     z-index: 1000;
     display: none;
@@ -1129,7 +1153,7 @@ body {
     background: #111;
     border: 1px solid var(--phosphor-main);
     color: var(--phosphor-main);
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
     font-size: 1rem;
     padding: 8px;
     box-sizing: border-box;
@@ -1229,7 +1253,7 @@ body {
     background: rgba(0, 0, 0, 0.7);
     border: 1px solid var(--phosphor-main);
     padding: 4px 12px;
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
     font-size: 1rem;
     color: var(--phosphor-main);
     text-shadow: 0 0 3px var(--phosphor-glow);
@@ -1276,7 +1300,7 @@ body {
     left: auto;
     bottom: auto;
     color: var(--phosphor-main);
-    font-family: 'VT323', monospace;
+    font-family: "VT323", monospace;
     font-size: 0.9rem;
     text-shadow: 0 0 4px var(--phosphor-glow);
     z-index: 200;
